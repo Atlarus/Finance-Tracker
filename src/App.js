@@ -154,6 +154,16 @@ const App = () => {
                             financialReportData={financialReportData}
                             ledgerData={ledgerData}
                         />} />
+                        <Route path='/Finance-Tracker' element={<DashboardPage
+                            accountsData={accountsData}
+                            invoices={invoiceData}
+                            bankReconciliationData={bankReconciliationData}
+                            budgetData={budgetData}
+                            cashFlowData={cashFlowData}
+                            expenseData={expenseData}
+                            financialReportData={financialReportData}
+                            ledgerData={ledgerData}
+                        />} />
                         <Route path="/accounts" element={<AccountsPage accountsData={accountsData} setAccountsData={setAccountsData} />} />
                         <Route path="/ledger" element={<GeneralLedgerPage ledgerData={ledgerData} setLedgerData={setLedgerData} />} />
                         <Route path="/expenses" element={<ExpenseManagementPage expenseData={expenseData} setExpenseData={setExpenseData} />} />
