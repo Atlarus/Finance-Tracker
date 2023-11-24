@@ -1,9 +1,20 @@
-import React, { useState } from 'react';
+// Import necessary modules or libraries
+import React, { useState, useEffect } from 'react';
+import { linearRegression } from './components/modules/forecastingService'; // Import your forecasting service
 
 const BudgetForecastPage = ({ budgetData, setBudgetData }) => {
   const [editingId, setEditingId] = useState(null);
   const [newEntry, setNewEntry] = useState({ month: '', projectedIncome: '', projectedExpenses: '' });
   const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+
+    // State for the forecasted entry
+    const [forecastedEntry, setForecastedEntry] = useState({ month: '', projectedIncome: '', projectedExpenses: '' });
+
+    // Effect to update forecastedEntry when budgetData changes
+    useEffect(() => {
+      const forecast = linearRegression(budgetData); // Use your forecasting service to get predictions
+      setForecastedEntry(forecast);
+    }, [budgetData]);
 
   const handleAddEntry = () => {
     setBudgetData([...budgetData, { ...newEntry, id: Date.now() }]);
@@ -26,9 +37,21 @@ const BudgetForecastPage = ({ budgetData, setBudgetData }) => {
     setBudgetData(budgetData.filter((entry) => entry.id !== id));
   };
 
+  const getTotalProjectedIncome = () => {
+    return budgetData.reduce((total, entry) => total + parseFloat(entry.projectedIncome), 0).toFixed(2);
+  };
+
+  const getTotalProjectedExpenses = () => {
+    return budgetData.reduce((total, entry) => total + parseFloat(entry.projectedExpenses), 0).toFixed(2);
+  };
+
   return (
     <div className="p-4">
       <h1 className="text-2xl font-bold mb-4">Budgeting and Forecasting</h1>
+      <div className="mb-4">
+        <p>Total Projected Income: ${getTotalProjectedIncome()}</p>
+        <p>Total Projected Expenses: ${getTotalProjectedExpenses()}</p>
+      </div>
       <table className="min-w-full border border-gray-300">
         <thead>
           <tr className="bg-gray-100">
@@ -161,6 +184,15 @@ const BudgetForecastPage = ({ budgetData, setBudgetData }) => {
           >
             Add Entry
           </button>
+        </div>
+      </div>
+
+      {/* Forecasting Section */}
+      <div className="mt-4">
+        <h2 className="text-lg font-bold mb-2">Forecasted Entry</h2>
+        <div className="space-y-2">
+          <p>Projected Income: ${forecastedEntry.projectedIncome}</p>
+          <p>Projected Expenses: ${forecastedEntry.projectedExpenses}</p>
         </div>
       </div>
     </div>
