@@ -16,7 +16,6 @@ const DashboardPage = ({
 
       {/* Add components for each section */}
       <div className="grid grid-cols-2 gap-4 mb-6">
-        <BudgetForecastView budgetData={budgetData} />
         <CashFlowManagementView cashFlowData={cashFlowData} />
         <FinancialReportView financialReportData={financialReportData} />
       </div>

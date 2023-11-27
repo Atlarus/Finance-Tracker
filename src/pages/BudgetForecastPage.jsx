@@ -1,199 +1,121 @@
 // Import necessary modules or libraries
 import React, { useState, useEffect } from 'react';
-import { linearRegression } from './components/modules/forecastingService'; // Import your forecasting service
+import { performSimpleForecasting } from './components/modules/forecastingService';
 
-const BudgetForecastPage = ({ budgetData, setBudgetData }) => {
-  const [editingId, setEditingId] = useState(null);
-  const [newEntry, setNewEntry] = useState({ month: '', projectedIncome: '', projectedExpenses: '' });
-  const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+const BudgetForecastPage = ({ ledgerData }) => {
+  const [selectedMonth, setSelectedMonth] = useState(getCurrentMonth());
+  const [predictedProfits, setPredictedProfits] = useState([]);
 
-    // State for the forecasted entry
-    const [forecastedEntry, setForecastedEntry] = useState({ month: '', projectedIncome: '', projectedExpenses: '' });
+  // Function to get the current month
+  function getCurrentMonth() {
+    const currentDate = new Date();
+    const year = currentDate.getFullYear();
+    const month = (currentDate.getMonth() + 1).toString().padStart(2, '0'); // Adding padding for single-digit months
+    return `${year}-${month}`;
+  }
 
-    // Effect to update forecastedEntry when budgetData changes
-    useEffect(() => {
-      const forecast = linearRegression(budgetData); // Use your forecasting service to get predictions
-      setForecastedEntry(forecast);
-    }, [budgetData]);
+  // Function to get unique months from ledgerData
+  function getUniqueMonths() {
+    const uniqueMonths = new Set();
+    ledgerData.forEach(account => {
+      account.entries.forEach(entry => {
+        const month = entry.date.substring(0, 7);
+        uniqueMonths.add(month);
+      });
+    });
+    return Array.from(uniqueMonths);
+  }
 
-  const handleAddEntry = () => {
-    setBudgetData([...budgetData, { ...newEntry, id: Date.now() }]);
-    setNewEntry({ month: '', projectedIncome: '', projectedExpenses: '' });
+  // Function to calculate total for the selected month
+  function calculateMonthlyTotal() {
+    return ledgerData.map(account => {
+      const entriesForMonth = account.entries.filter(entry => entry.date.startsWith(selectedMonth));
+      const monthlyTotal = entriesForMonth.reduce((acc, entry) => acc + entry.debit - entry.credit, 0);
+      return {
+        accountName: account.accountName,
+        totalWithCarryOver: monthlyTotal,
+      };
+    });
+  }
+
+  // Function to handle month selection change
+  const handleMonthChange = (event) => {
+    setSelectedMonth(event.target.value);
   };
 
-  const handleEditEntry = (id) => {
-    setEditingId(id);
-    const entryToEdit = budgetData.find((entry) => entry.id === id);
-    setNewEntry({ ...entryToEdit });
+  // Function to generate budget display for the selected month in a table
+  const generateBudgetTable = () => {
+    const months = getUniqueMonths();
+
+    return (
+      <div>
+        <label htmlFor="monthSelector" className="mr-2">Select Month:</label>
+        <select
+          id="monthSelector"
+          className="border rounded p-1"
+          value={selectedMonth}
+          onChange={handleMonthChange}
+        >
+          {months.map(month => (
+            <option key={month} value={month}>{`Budget for ${month}`}</option>
+          ))}
+        </select>
+
+        <table className="min-w-full bg-white border border-gray-300 mt-4">
+          <thead>
+            <tr>
+              <th className="py-2 px-4 border-b">Account</th>
+              <th className="py-2 px-4 border-b">{`Budget for ${selectedMonth}`}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {calculateMonthlyTotal().map(({ accountName, totalWithCarryOver }) => (
+              <tr key={accountName} className="hover:bg-gray-100 transition duration-300">
+                <td className="py-2 px-4 border-b">{accountName}</td>
+                <td className="py-2 px-4 border-b">{totalWithCarryOver}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+    );
   };
 
-  const handleUpdateEntry = () => {
-    setBudgetData(budgetData.map((entry) => (entry.id === editingId ? newEntry : entry)));
-    setEditingId(null);
-    setNewEntry({ month: '', projectedIncome: '', projectedExpenses: '' });
-  };
+  // Function to get future months
+function getFutureMonths(startMonth, numMonths) {
+  const months = [];
+  let currentMonth = new Date(startMonth);
 
-  const handleRemoveEntry = (id) => {
-    setBudgetData(budgetData.filter((entry) => entry.id !== id));
-  };
+  for (let i = 0; i < numMonths; i++) {
+    months.push(`${currentMonth.getFullYear()}-${(currentMonth.getMonth() + 1).toString().padStart(2, '0')}`);
+    currentMonth.setMonth(currentMonth.getMonth() + 1);
+  }
 
-  const getTotalProjectedIncome = () => {
-    return budgetData.reduce((total, entry) => total + parseFloat(entry.projectedIncome), 0).toFixed(2);
-  };
+  return months;
+}
 
-  const getTotalProjectedExpenses = () => {
-    return budgetData.reduce((total, entry) => total + parseFloat(entry.projectedExpenses), 0).toFixed(2);
-  };
+useEffect(() => {
+  // Perform forecasting using the simple calculation
+  const numMonthsToPredict = 12; // Adjust the number of months as needed
+  const simplePredictions = performSimpleForecasting(ledgerData, numMonthsToPredict);
+  setPredictedProfits(simplePredictions);
+}, [selectedMonth, ledgerData]);
 
   return (
-    <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">Budgeting and Forecasting</h1>
-      <div className="mb-4">
-        <p>Total Projected Income: ${getTotalProjectedIncome()}</p>
-        <p>Total Projected Expenses: ${getTotalProjectedExpenses()}</p>
-      </div>
-      <table className="min-w-full border border-gray-300">
-        <thead>
-          <tr className="bg-gray-100">
-            <th className="py-2 px-4 border-b">Month</th>
-            <th className="py-2 px-4 border-b">Projected Income</th>
-            <th className="py-2 px-4 border-b">Projected Expenses</th>
-            <th className="py-2 px-4 border-b">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {budgetData.map((entry) => (
-            <tr key={entry.id} className="hover:bg-gray-50 transition duration-300">
-              <td className="py-2 px-4 border-b text-center">
-                {editingId === entry.id ? (
-                  <select
-                    value={newEntry.month}
-                    onChange={(e) => setNewEntry({ ...newEntry, month: e.target.value })}
-                    className="mt-1 p-2 border rounded-md w-full"
-                  >
-                    {months.map((month) => (
-                      <option key={month} value={month}>
-                        {month}
-                      </option>
-                    ))}
-                  </select>
-                ) : (
-                  entry.month
-                )}
-              </td>
-              <td className="py-2 px-4 border-b text-center">
-                {editingId === entry.id ? (
-                  <input
-                    type="number"
-                    value={newEntry.projectedIncome}
-                    onChange={(e) => setNewEntry({ ...newEntry, projectedIncome: e.target.value })}
-                    className="mt-1 p-2 border rounded-md w-full"
-                  />
-                ) : (
-                  entry.projectedIncome
-                )}
-              </td>
-              <td className="py-2 px-4 border-b text-center">
-                {editingId === entry.id ? (
-                  <input
-                    type="number"
-                    value={newEntry.projectedExpenses}
-                    onChange={(e) => setNewEntry({ ...newEntry, projectedExpenses: e.target.value })}
-                    className="mt-1 p-2 border rounded-md w-full"
-                  />
-                ) : (
-                  entry.projectedExpenses
-                )}
-              </td>
-              <td className="py-2 px-4 border-b">
-                {editingId === entry.id ? (
-                  <div className="flex space-x-2">
-                    <button
-                      onClick={handleUpdateEntry}
-                      className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-700"
-                    >
-                      Update
-                    </button>
-                    <button
-                      onClick={() => setEditingId(null)}
-                      className="bg-gray-500 text-white py-2 px-4 rounded-md hover:bg-gray-700"
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                ) : (
-                  <div className="flex space-x-2">
-                    <button
-                      onClick={() => handleEditEntry(entry.id)}
-                      className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-700"
-                    >
-                      Edit
-                    </button>
-                    <button
-                      onClick={() => handleRemoveEntry(entry.id)}
-                      className="bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-700"
-                    >
-                      Delete
-                    </button>
-                  </div>
-                )}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-      <div className="mt-4">
-        <h2 className="text-lg font-bold mb-2">Add New Entry</h2>
-        <div className="space-y-2">
-          <div>
-          <label className="block text-sm font-medium text-gray-700">Month:</label>
-            <select
-              value={newEntry.month}
-              onChange={(e) => setNewEntry({ ...newEntry, month: e.target.value })}
-              className="mt-1 p-2 border rounded-md w-full"
-            >
-              <option value="" disabled>Select Month</option>
-              {months.map((month) => (
-                <option key={month} value={month}>
-                  {month}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Projected Income:</label>
-            <input
-              type="number"
-              value={newEntry.projectedIncome}
-              onChange={(e) => setNewEntry({ ...newEntry, projectedIncome: e.target.value })}
-              className="mt-1 p-2 border rounded-md w-full"
-            />
-          </div>
-          <div>
-            <label className="block text-sm font-medium text-gray-700">Projected Expenses:</label>
-            <input
-              type="number"
-              value={newEntry.projectedExpenses}
-              onChange={(e) => setNewEntry({ ...newEntry, projectedExpenses: e.target.value })}
-              className="mt-1 p-2 border rounded-md w-full"
-            />
-          </div>
-          <button
-            onClick={handleAddEntry}
-            className="bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-700"
-          >
-            Add Entry
-          </button>
-        </div>
-      </div>
+    <div className="container mx-auto p-8">
+      <h1 className="text-3xl font-bold mb-4">Budgeting and Forecasting</h1>
+      {generateBudgetTable()}
 
-      {/* Forecasting Section */}
-      <div className="mt-4">
-        <h2 className="text-lg font-bold mb-2">Forecasted Entry</h2>
-        <div className="space-y-2">
-          <p>Projected Income: ${forecastedEntry.projectedIncome}</p>
-          <p>Projected Expenses: ${forecastedEntry.projectedExpenses}</p>
-        </div>
+            {/* Add a chart or display the predictedProfits as needed */}
+      {/* Example: Display predicted profits for each month */}
+      {/* Display predicted profits using the simple calculation */}
+      <div>
+        <h2 className="text-xl font-semibold mb-2">Predicted Profits for the Next 12 Months</h2>
+        <ul>
+          {predictedProfits.map((prediction, index) => (
+            <li key={index}>{`Month ${index + 1}: ${prediction.toFixed(2)}`}</li>
+          ))}
+        </ul>
       </div>
     </div>
   );

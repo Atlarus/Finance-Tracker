@@ -77,13 +77,6 @@ const App = () => {
         // Add more dummy data as needed
       ], []);
 
-    // Dummy budget data for demonstration
-    const dummyBudgetData = useMemo(() => [
-        { id: 1, month: 'January', projectedIncome: 5000, projectedExpenses: 3000 },
-        { id: 2, month: 'February', projectedIncome: 5500, projectedExpenses: 3200 },
-        // Add more dummy data as needed
-    ], []);
-
     // Dummy financial report data for demonstration
     const dummyFinancialReportData = useMemo(() => [
         { id: 1, year: 2022, revenue: 60000, expenses: 45000, netIncome: 15000 },
@@ -141,7 +134,6 @@ const App = () => {
   
     // State to store ledger and accounts data
     const [ledgerData, setLedgerData] = useState([]);
-    const [budgetData, setBudgetData] = useState([]);
     const [financialReportData, setFinancialReportData] = useState([]);
     const [cashFlowData, setCashFlowData] = useState([]);
     const [invoiceData, setInvoiceData] = useState([]);
@@ -149,11 +141,10 @@ const App = () => {
     // Example: Fetch ledger and accounts data from a server (simulated with useEffect)
     useEffect(() => {
         setLedgerData(dummyLedgerData);
-        setBudgetData(dummyBudgetData);
         setFinancialReportData(dummyFinancialReportData);
         setCashFlowData(dummyCashFlowData);
         setInvoiceData(dummyInvoices);
-    }, [dummyLedgerData, dummyBudgetData, dummyFinancialReportData, dummyCashFlowData, dummyInvoices]);
+    }, [dummyLedgerData, dummyFinancialReportData, dummyCashFlowData, dummyInvoices]);
 
     return (
         <Router>
@@ -170,10 +161,10 @@ const App = () => {
                 </nav>
                 <Routes>
                     <Route path="/" exact>
-                        <Route index element={<DashboardPage {...{ invoices: invoiceData, budgetData, cashFlowData, financialReportData }} />} />
-                        <Route path="/Finance-Tracker" element={<DashboardPage {...{ invoices: invoiceData, budgetData, cashFlowData, financialReportData }} />} />
+                        <Route index element={<DashboardPage {...{ invoices: invoiceData, cashFlowData, financialReportData }} />} />
+                        <Route path="/Finance-Tracker" element={<DashboardPage {...{ invoices: invoiceData, cashFlowData, financialReportData }} />} />
                         <Route path="/ledger" element={<GeneralLedgerPage ledgerData={ledgerData} setLedgerData={setLedgerData} />} />
-                        <Route path="/budget" element={<BudgetForecastPage budgetData={budgetData} setBudgetData={setBudgetData} />} />
+                        <Route path="/budget" element={<BudgetForecastPage ledgerData={ledgerData} />} />
                         <Route path="/report" element={<FinancialReportPage financialReportData={financialReportData} setFinancialReportData={setFinancialReportData} />} />
                         <Route path="/cashflow" element={<CashFlowManagementPage cashFlowData={cashFlowData} setCashFlowData={setCashFlowData} />} />
                         <Route path="/invoice" element={<InvoicePage invoices={invoiceData} setInvoiceData={setInvoiceData} />} />
