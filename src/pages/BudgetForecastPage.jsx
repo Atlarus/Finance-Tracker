@@ -1,124 +1,143 @@
-// Import necessary modules or libraries
 import React, { useState, useEffect } from 'react';
-import { performSimpleForecasting } from './components/modules/forecastingService';
+import regression from 'regression';
 
-const BudgetForecastPage = ({ ledgerData }) => {
-  const [selectedMonth, setSelectedMonth] = useState(getCurrentMonth());
-  const [predictedProfits, setPredictedProfits] = useState([]);
+const BudgetingForecastPage = ({ ledgerData }) => {
+  // Extract unique years from ledgerData
+  const uniqueYears = [...new Set(ledgerData.flatMap(account => account.entries.map(entry => entry.date.substring(0, 4))))];
 
-  // Function to get the current month
-  function getCurrentMonth() {
-    const currentDate = new Date();
-    const year = currentDate.getFullYear();
-    const month = (currentDate.getMonth() + 1).toString().padStart(2, '0'); // Adding padding for single-digit months
-    return `${year}-${month}`;
-  }
+  // State to track the selected year
+  const [selectedYear, setSelectedYear] = useState(uniqueYears[0]); // Set the default selected year
 
-  // Function to get unique months from ledgerData
-  function getUniqueMonths() {
-    const uniqueMonths = new Set();
-    ledgerData.forEach(account => {
-      account.entries.forEach(entry => {
+  const [regressionData, setRegressionData] = useState(null);
+
+  // Filter data based on the selected year
+  const filteredData = ledgerData.filter(account =>
+    account.entries.some(entry => entry.date.startsWith(selectedYear))
+  );
+
+  // Calculate overall totals for the selected year
+  const overallDebit = filteredData.reduce((total, account) =>
+    total + account.entries.reduce((acc, entry) => entry.date.startsWith(selectedYear) ? acc + entry.debit : acc, 0), 0);
+
+  const overallCredit = filteredData.reduce((total, account) =>
+    total + account.entries.reduce((acc, entry) => entry.date.startsWith(selectedYear) ? acc + entry.credit : acc, 0), 0);
+
+  // Calculate budget by month
+  const budgetByMonth = filteredData.reduce((result, account) => {
+    account.entries.forEach(entry => {
+      const entryYear = entry.date.substring(0, 4); // Extract year from the entry date
+      if (entryYear === selectedYear) {
         const month = entry.date.substring(0, 7);
-        uniqueMonths.add(month);
-      });
+        if (!result[month]) {
+          result[month] = { debit: 0, credit: 0, balance: 0 }; // Set balance as 0, not "0"
+        }
+        result[month].debit += parseFloat(entry.debit); // Ensure debit is treated as a number
+        result[month].credit += parseFloat(entry.credit); // Ensure credit is treated as a number
+        result[month].balance = (result[month].debit - result[month].credit).toFixed(2);
+      }
     });
-    return Array.from(uniqueMonths);
-  }
+    return result;
+  }, {});
 
-  // Function to calculate total for the selected month
-  function calculateMonthlyTotal() {
-    return ledgerData.map(account => {
-      const entriesForMonth = account.entries.filter(entry => entry.date.startsWith(selectedMonth));
-      const monthlyTotal = entriesForMonth.reduce((acc, entry) => acc + entry.debit - entry.credit, 0);
-      return {
-        accountName: account.accountName,
-        totalWithCarryOver: monthlyTotal,
-      };
+  // Calculate overall balance for the selected year
+  const overallBalance = (overallDebit - overallCredit).toFixed(2); // Use toFixed for precision
+
+  const calculateRegression = () => {
+    const entries = filteredData.flatMap(account => account.entries);
+    const revenueData = entries
+      .filter(entry => entry.category === 'Revenue')
+      .map(entry => [new Date(entry.date).getTime(), entry.credit]);
+  
+    const expenseData = entries
+      .filter(entry => entry.category === 'Expense')
+      .map(entry => [new Date(entry.date).getTime(), entry.debit]);
+  
+    console.log('Revenue Data:', revenueData);
+    console.log('Expense Data:', expenseData);
+  
+    const revenueResult = regression.linear(revenueData);
+    const expenseResult = regression.linear(expenseData);
+  
+    console.log('Revenue Result:', revenueResult);
+    console.log('Expense Result:', expenseResult);
+  
+    setRegressionData({
+      revenue: revenueResult,
+      expense: expenseResult,
     });
-  }
-
-  // Function to handle month selection change
-  const handleMonthChange = (event) => {
-    setSelectedMonth(event.target.value);
   };
 
-  // Function to generate budget display for the selected month in a table
-  const generateBudgetTable = () => {
-    const months = getUniqueMonths();
+  useEffect(() => {
+    calculateRegression();
+  }, [selectedYear]);
 
     return (
-      <div>
-        <label htmlFor="monthSelector" className="mr-2">Select Month:</label>
-        <select
-          id="monthSelector"
-          className="border rounded p-1"
-          value={selectedMonth}
-          onChange={handleMonthChange}
-        >
-          {months.map(month => (
-            <option key={month} value={month}>{`Budget for ${month}`}</option>
-          ))}
-        </select>
+        <div className="container mx-auto p-4">
+            <h1 className="text-3xl font-bold mb-4">Budget Overview</h1>
 
-        <table className="min-w-full bg-white border border-gray-300 mt-4">
-          <thead>
-            <tr>
-              <th className="py-2 px-4 border-b">Account</th>
-              <th className="py-2 px-4 border-b">{`Budget for ${selectedMonth}`}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {calculateMonthlyTotal().map(({ accountName, totalWithCarryOver }) => (
-              <tr key={accountName} className="hover:bg-gray-100 transition duration-300">
-                <td className="py-2 px-4 border-b">{accountName}</td>
-                <td className="py-2 px-4 border-b">{totalWithCarryOver}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            {/* Year Selection Dropdown */}
+            <label className="block mb-4">
+                Select Year:
+                <select
+                    className="border border-gray-300 p-2 ml-2"
+                    value={selectedYear}
+                    onChange={(e) => setSelectedYear(e.target.value)}
+                >
+                    {uniqueYears.map(year => (
+                        <option key={year} value={year}>{year}</option>
+                    ))}
+                </select>
+            </label>
+
+            {/* Budget by Month Table */}
+            <table className="min-w-full bg-white border border-gray-300">
+                <thead>
+                    <tr className="bg-gray-100">
+                        <th className="py-2 px-4">Month</th>
+                        <th className="py-2 px-4">Total Debit</th>
+                        <th className="py-2 px-4">Total Credit</th>
+                        <th className="py-2 px-4">Balance</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {Object.keys(budgetByMonth).map(month => (
+                        <tr key={month}>
+                            <td className="py-2 px-4">{month}</td>
+                            <td className="py-2 px-4">{parseFloat(budgetByMonth[month].debit).toFixed(2)}</td>
+                            <td className="py-2 px-4">{parseFloat(budgetByMonth[month].credit).toFixed(2)}</td>
+                            <td className="py-2 px-4">{parseFloat(budgetByMonth[month].balance).toFixed(2)}</td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
+
+            {/* Overall Budget Totals */}
+            <h2 className="text-2xl font-bold mt-8">Overall Totals</h2>
+            <table className="min-w-full bg-white border border-gray-300">
+                <thead>
+                    <tr className="bg-gray-100">
+                        <th className="py-2 px-4">Total Debit</th>
+                        <th className="py-2 px-4">Total Credit</th>
+                        <th className="py-2 px-4">Balance</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td className="py-2 px-4">{parseFloat(overallDebit).toFixed(2)}</td>
+                        <td className="py-2 px-4">{parseFloat(overallCredit).toFixed(2)}</td>
+                        <td className="py-2 px-4">{overallBalance}</td>
+                    </tr>
+                </tbody>
+            </table>
+            {regressionData && (
+              <div className="mt-8">
+                <h2 className="text-2xl font-bold">Regression Analysis</h2>
+                <p>Revenue Forecast: {regressionData.revenue.equation}</p>
+                <p>Expense Forecast: {regressionData.expense.equation}</p>
+              </div>
+            )}
+        </div>
     );
-  };
-
-  // Function to get future months
-function getFutureMonths(startMonth, numMonths) {
-  const months = [];
-  let currentMonth = new Date(startMonth);
-
-  for (let i = 0; i < numMonths; i++) {
-    months.push(`${currentMonth.getFullYear()}-${(currentMonth.getMonth() + 1).toString().padStart(2, '0')}`);
-    currentMonth.setMonth(currentMonth.getMonth() + 1);
-  }
-
-  return months;
-}
-
-useEffect(() => {
-  // Perform forecasting using the simple calculation
-  const numMonthsToPredict = 12; // Adjust the number of months as needed
-  const simplePredictions = performSimpleForecasting(ledgerData, numMonthsToPredict);
-  setPredictedProfits(simplePredictions);
-}, [selectedMonth, ledgerData]);
-
-  return (
-    <div className="container mx-auto p-8">
-      <h1 className="text-3xl font-bold mb-4">Budgeting and Forecasting</h1>
-      {generateBudgetTable()}
-
-            {/* Add a chart or display the predictedProfits as needed */}
-      {/* Example: Display predicted profits for each month */}
-      {/* Display predicted profits using the simple calculation */}
-      <div>
-        <h2 className="text-xl font-semibold mb-2">Predicted Profits for the Next 12 Months</h2>
-        <ul>
-          {predictedProfits.map((prediction, index) => (
-            <li key={index}>{`Month ${index + 1}: ${prediction.toFixed(2)}`}</li>
-          ))}
-        </ul>
-      </div>
-    </div>
-  );
 };
 
-export default BudgetForecastPage;
+export default BudgetingForecastPage;

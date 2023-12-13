@@ -77,20 +77,6 @@ const App = () => {
         // Add more dummy data as needed
       ], []);
 
-    // Dummy financial report data for demonstration
-    const dummyFinancialReportData = useMemo(() => [
-        { id: 1, year: 2022, revenue: 60000, expenses: 45000, netIncome: 15000 },
-        { id: 2, year: 2021, revenue: 55000, expenses: 40000, netIncome: 15000 },
-        // Add more dummy data as needed
-    ], []);
-
-    // Dummy cash flow data for demonstration
-    const dummyCashFlowData = useMemo(() => [
-        { id: 1, date: '2023-01-05', transactionType: 'Income', amount: 2000 },
-        { id: 2, date: '2023-01-06', transactionType: 'Expense', amount: 800 },
-        // Add more dummy data as needed
-    ], []);
-
     // Dummy data for invoices
     const dummyInvoices = useMemo(() => [
         { 
@@ -135,38 +121,32 @@ const App = () => {
     // State to store ledger and accounts data
     const [ledgerData, setLedgerData] = useState([]);
     const [financialReportData, setFinancialReportData] = useState([]);
-    const [cashFlowData, setCashFlowData] = useState([]);
     const [invoiceData, setInvoiceData] = useState([]);
   
     // Example: Fetch ledger and accounts data from a server (simulated with useEffect)
     useEffect(() => {
         setLedgerData(dummyLedgerData);
-        setFinancialReportData(dummyFinancialReportData);
-        setCashFlowData(dummyCashFlowData);
         setInvoiceData(dummyInvoices);
-    }, [dummyLedgerData, dummyFinancialReportData, dummyCashFlowData, dummyInvoices]);
+    }, [dummyLedgerData, dummyInvoices]);
 
     return (
         <Router>
             <div className="font-sans min-h-screen flex flex-col">
                 <nav className="bg-gray-800 text-white p-4">
                     <ul className="flex space-x-4">
-                        <li><Link to="/" className="hover:text-gray-300">Dashboard</Link></li>
                         <li><Link to="/invoice" className="hover:text-gray-300">Invoice</Link></li>
                         <li><Link to="/ledger" className="hover:text-gray-300">General Ledger</Link></li>
                         <li><Link to="/budget" className="hover:text-gray-300">Budgeting and Forecasting</Link></li>
                         <li><Link to="/report" className="hover:text-gray-300">Financial Report</Link></li>
-                        <li><Link to="/cashflow" className="hover:text-gray-300">Cash Flow Management</Link></li>
                     </ul>
                 </nav>
                 <Routes>
                     <Route path="/" exact>
-                        <Route index element={<DashboardPage {...{ invoices: invoiceData, cashFlowData, financialReportData }} />} />
-                        <Route path="/Finance-Tracker" element={<DashboardPage {...{ invoices: invoiceData, cashFlowData, financialReportData }} />} />
+                        <Route index element={<GeneralLedgerPage ledgerData={ledgerData} setLedgerData={setLedgerData} />} />
+                        <Route path="/Finance-Tracker" element={<GeneralLedgerPage ledgerData={ledgerData} setLedgerData={setLedgerData} />} />
                         <Route path="/ledger" element={<GeneralLedgerPage ledgerData={ledgerData} setLedgerData={setLedgerData} />} />
                         <Route path="/budget" element={<BudgetForecastPage ledgerData={ledgerData} />} />
-                        <Route path="/report" element={<FinancialReportPage financialReportData={financialReportData} setFinancialReportData={setFinancialReportData} />} />
-                        <Route path="/cashflow" element={<CashFlowManagementPage cashFlowData={cashFlowData} setCashFlowData={setCashFlowData} />} />
+                        <Route path="/report" element={<FinancialReportPage ledgerData={ledgerData} />} />
                         <Route path="/invoice" element={<InvoicePage invoices={invoiceData} setInvoiceData={setInvoiceData} />} />
                     </Route>
                 </Routes>

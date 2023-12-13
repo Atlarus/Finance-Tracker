@@ -17,7 +17,6 @@ const DashboardPage = ({
       {/* Add components for each section */}
       <div className="grid grid-cols-2 gap-4 mb-6">
         <CashFlowManagementView cashFlowData={cashFlowData} />
-        <FinancialReportView financialReportData={financialReportData} />
       </div>
 
       {/* Additional summary or charts can be added here */}

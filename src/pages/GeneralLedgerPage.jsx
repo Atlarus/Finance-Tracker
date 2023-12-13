@@ -1,6 +1,7 @@
 // GeneralLedgerPage.js
 
 import React, { useState, useEffect, useCallback } from 'react';
+import isEqual from 'lodash/isEqual';
 
 const GeneralLedgerPage = ({ ledgerData, setLedgerData }) => {
   const [editingAccountCode, setEditingAccountCode] = useState(null);
@@ -22,10 +23,49 @@ const GeneralLedgerPage = ({ ledgerData, setLedgerData }) => {
 
   const [selectedAccountCode, setSelectedAccountCode] = useState(null);
 
+  const allEntries = ledgerData.flatMap((account) =>
+    account.entries.map((entry) => ({
+        accountCode: account.accountCode,
+        ...entry,
+    }))
+    );
+
   const calculateBalance = useCallback((entries) => {
-      const total = entries.reduce((total, entry) => total + (parseFloat(entry.debit) - parseFloat(entry.credit)), 0);
-      return parseFloat(total.toFixed(2));
-  }, []);
+    const total = entries.reduce((total, entry) => total + (parseFloat(entry.debit) - parseFloat(entry.credit)), 0);
+    return parseFloat(total.toFixed(2));
+}, []);
+
+const [sortConfig, setSortConfig] = useState({
+    key: 'date',
+    direction: 'desc', // default sorting direction
+  });
+  
+  const sortedEntries = allEntries.slice().sort((a, b) => {
+    const direction = sortConfig.direction === 'asc' ? 1 : -1;
+  
+    if (a[sortConfig.key] < b[sortConfig.key]) {
+      return -1 * direction;
+    }
+    if (a[sortConfig.key] > b[sortConfig.key]) {
+      return 1 * direction;
+    }
+    return 0;
+  });
+  
+  const requestSort = (key) => {
+    let direction = 'asc';
+    if (sortConfig.key === key && sortConfig.direction === 'asc') {
+      direction = 'desc';
+    }
+    setSortConfig({ key, direction });
+  };
+  
+  const getSortIndicator = (columnKey) => {
+    if (sortConfig.key === columnKey) {
+      return sortConfig.direction === 'asc' ? '↑' : '↓';
+    }
+    return '';
+  };
 
     // Define the types for the dropdown
     const accountTypes = ['Asset', 'Liability', 'Equity', 'Income', 'Expense'];
@@ -81,16 +121,20 @@ const GeneralLedgerPage = ({ ledgerData, setLedgerData }) => {
       }
   }, [calculateBalance, editingAccountCode, isAccountCodeUnique, ledgerData, newAccount, setLedgerData]);
 
-  const handleRemoveAccount = useCallback((accountCode) => {
-    setLedgerData(ledgerData.filter((account) => account.accountCode !== accountCode));
-    setEditingAccountCode(null);
-    setNewAccount({
-        accountCode: '',
-        accountName: '',
-        accountType: '',
-        balance: 0,
-    });
-    console.log("Updated Ledger Data:", ledgerData);
+// Inside handleRemoveAccount function
+const handleRemoveAccount = useCallback((accountCode) => {
+    const confirmDeletion = window.confirm("Are you sure you want to delete this account?");
+    if (confirmDeletion) {
+        setLedgerData(ledgerData.filter((account) => account.accountCode !== accountCode));
+        setEditingAccountCode(null);
+        setNewAccount({
+            accountCode: '',
+            accountName: '',
+            accountType: '',
+            balance: 0,
+        });
+        console.log("Updated Ledger Data:", ledgerData);
+    }
 }, [ledgerData, setLedgerData]);
 
     const handleRowClick = (accountCode) => {
@@ -111,27 +155,27 @@ const GeneralLedgerPage = ({ ledgerData, setLedgerData }) => {
     };
 
     const handleUpdateEntry = () => {
-      const updatedLedgerData = ledgerData.map((account) => {
-          const updatedEntries = account.entries.map((entry) =>
-              entry.id === editingEntryId ? newEntry : entry
-          );
-          return {
-              ...account,
-              entries: updatedEntries,
-              balance: calculateBalance(updatedEntries),
-          };
-      });
-  
-      setLedgerData(updatedLedgerData);
-      setEditingEntryId(null);
-      setNewEntry({
-          id: '',
-          date: '',
-          description: '',
-          debit: 0,
-          credit: 0,
-      });
-  };
+        const updatedLedgerData = ledgerData.map((account) => {
+            const updatedEntries = account.entries.map((entry) =>
+                entry.id === editingEntryId ? { ...newEntry, debit: parseFloat(newEntry.debit), credit: parseFloat(newEntry.credit) } : entry
+            );
+            return {
+                ...account,
+                entries: updatedEntries,
+                balance: parseFloat(calculateBalance(updatedEntries).toFixed(2)), // Round the balance
+            };
+        });
+    
+        setLedgerData(updatedLedgerData);
+        setEditingEntryId(null);
+        setNewEntry({
+            id: '',
+            date: '',
+            description: '',
+            debit: 0,
+            credit: 0,
+        });
+    };
 
   const handleRemoveEntry = (entryId) => {
     const updatedLedgerData = ledgerData.map((account) => {
@@ -154,48 +198,55 @@ const GeneralLedgerPage = ({ ledgerData, setLedgerData }) => {
     });
 };
 
-    const handleAddEntry = () => {
-      if (selectedAccountCode) {
-          const updatedLedgerData = ledgerData.map((account) => {
-              if (account.accountCode === selectedAccountCode) {
-                  const newEntryWithId = {
-                      ...newEntry,
-                      id: Date.now(),
-                  };
-                  const updatedEntries = [...account.entries, newEntryWithId];
-                  return {
-                      ...account,
-                      entries: updatedEntries,
-                      balance: calculateBalance(updatedEntries),
-                  };
-              }
-              return account;
-          });
+// Inside handleAddEntry function
+const handleAddEntry = () => {
+    if (selectedAccountCode) {
+        const updatedLedgerData = ledgerData.map((account) => {
+            if (account.accountCode === selectedAccountCode) {
+                const newEntryWithId = {
+                    ...newEntry,
+                    id: Date.now(),
+                    debit: parseFloat(newEntry.debit), // Ensure debit is treated as a number
+                    credit: parseFloat(newEntry.credit), // Ensure credit is treated as a number
+                };
+                const updatedEntries = [...account.entries, newEntryWithId];
+                return {
+                    ...account,
+                    entries: updatedEntries,
+                    balance: calculateBalance(updatedEntries),
+                };
+            }
+            return account;
+        });
 
-          setLedgerData(updatedLedgerData);
-          setNewEntry({
-              id: '',
-              date: '',
-              description: '',
-              debit: 0,
-              credit: 0,
-          });
-      } else {
-          alert("Please select an account before adding an entry.");
-      }
-  };
+        setLedgerData(updatedLedgerData);
+        setNewEntry({
+            id: '',
+            date: '',
+            description: '',
+            debit: 0,
+            credit: 0,
+        });
+    } else {
+        alert("Please select an account before adding an entry.");
+    }
+};
 
 
-  useEffect(() => {
+useEffect(() => {
     console.log("useEffect triggered");
+
+    // Calculate balances for all accounts
     const updatedLedgerData = ledgerData.map((account) => ({
         ...account,
         balance: calculateBalance(account.entries),
     }));
 
-    setLedgerData(updatedLedgerData);
+    // Update ledgerData only if there's a change
+    if (!isEqual(ledgerData, updatedLedgerData)) {
+        setLedgerData(updatedLedgerData);
+    }
 
-    // Include setLedgerData in the dependency array
 }, [calculateBalance, ledgerData, setLedgerData]);
 
     return (
@@ -403,6 +454,42 @@ const GeneralLedgerPage = ({ ledgerData, setLedgerData }) => {
                     ))}
                 </tbody>
             </table>
+
+    {/* All Entries Table */}
+    <h2 className="text-xl font-bold mb-2 text-gray-800">All Entries</h2>
+    <table className="min-w-full bg-blue-50 border border-blue-200">
+      <thead>
+        <tr className="bg-blue-100">
+          <th onClick={() => requestSort('accountCode')} className="py-2 px-4 border-b text-left cursor-pointer">
+            Account Code {getSortIndicator('accountCode')}
+          </th>
+          <th onClick={() => requestSort('date')} className="py-2 px-4 border-b text-left cursor-pointer">
+            Date {getSortIndicator('date')}
+          </th>
+          <th onClick={() => requestSort('description')} className="py-2 px-4 border-b text-left cursor-pointer">
+            Description {getSortIndicator('description')}
+          </th>
+          <th onClick={() => requestSort('debit')} className="py-2 px-4 border-b text-left cursor-pointer">
+            Debit {getSortIndicator('debit')}
+          </th>
+          <th onClick={() => requestSort('credit')} className="py-2 px-4 border-b text-left cursor-pointer">
+            Credit {getSortIndicator('credit')}
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        {sortedEntries.map((entry) => (
+          <tr key={entry.id}>
+            <td className="py-2 px-4 border-b">{entry.accountCode}</td>
+            <td className="py-2 px-4 border-b">{entry.date}</td>
+            <td className="py-2 px-4 border-b">{entry.description}</td>
+            <td className="py-2 px-4 border-b">{parseFloat(entry.debit).toFixed(2)}</td>
+            <td className="py-2 px-4 border-b">{parseFloat(entry.credit).toFixed(2)}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+
             <div className="bg-blue-50 border border-blue-200 p-4 mb-4 mt-4 rounded-md">
                 <h2 className="text-xl font-bold mb-2 text-gray-800">Add New Account</h2>
                 <div className="space-y-2">
@@ -431,7 +518,7 @@ const GeneralLedgerPage = ({ ledgerData, setLedgerData }) => {
                             onChange={(e) => setNewAccount({ ...newAccount, accountType: e.target.value })}
                             className="mt-1 p-2 border rounded-md w-full focus:outline-none focus:ring focus:border-blue-300"
                         >
-                          <option value="" disabled selected="selected">Select an account</option>
+                            <option value="" disabled>Select Account Type</option>
                             {accountTypes.map((type) => (
                                 <option key={type} value={type}>
                                     {type}
@@ -458,7 +545,7 @@ const GeneralLedgerPage = ({ ledgerData, setLedgerData }) => {
                             onChange={(e) => setSelectedAccountCode(e.target.value)}
                             className="mt-1 p-2 border rounded-md w-full focus:outline-none focus:ring focus:border-blue-300"
                         >
-                            <option value="" disabled selected="selected">Select an account</option>
+                            <option value="" disabled selected="selected">Select Account</option>
                             {ledgerData.map((account) => (
                                 <option key={account.accountCode} value={account.accountCode}>
                                     {account.accountCode} - {account.accountName}
