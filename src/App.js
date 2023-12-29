@@ -4,8 +4,6 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { HashRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import InvoicePage from './pages/InvoicePage';
 import BudgetForecastPage from './pages/BudgetForecastPage';
-import CashFlowManagementPage from './pages/CashFlowManagementPage';
-import DashboardPage from './pages/DashboardPage';
 import FinancialReportPage from './pages/FinancialReportPage';
 import GeneralLedgerPage from './pages/GeneralLedgerPage';
 
@@ -120,7 +118,6 @@ const App = () => {
   
     // State to store ledger and accounts data
     const [ledgerData, setLedgerData] = useState([]);
-    const [financialReportData, setFinancialReportData] = useState([]);
     const [invoiceData, setInvoiceData] = useState([]);
   
     // Example: Fetch ledger and accounts data from a server (simulated with useEffect)
@@ -135,7 +132,7 @@ const App = () => {
                 <nav className="bg-gray-800 text-white p-4">
                     <ul className="flex space-x-4">
                         <li><Link to="/invoice" className="hover:text-gray-300">Invoice</Link></li>
-                        <li><Link to="/ledger" className="hover:text-gray-300">General Ledger</Link></li>
+                        <li><Link to="/" className="hover:text-gray-300">General Ledger</Link></li>
                         <li><Link to="/budget" className="hover:text-gray-300">Budgeting and Forecasting</Link></li>
                         <li><Link to="/report" className="hover:text-gray-300">Financial Report</Link></li>
                     </ul>
@@ -144,7 +141,6 @@ const App = () => {
                     <Route path="/" exact>
                         <Route index element={<GeneralLedgerPage ledgerData={ledgerData} setLedgerData={setLedgerData} />} />
                         <Route path="/Finance-Tracker" element={<GeneralLedgerPage ledgerData={ledgerData} setLedgerData={setLedgerData} />} />
-                        <Route path="/ledger" element={<GeneralLedgerPage ledgerData={ledgerData} setLedgerData={setLedgerData} />} />
                         <Route path="/budget" element={<BudgetForecastPage ledgerData={ledgerData} />} />
                         <Route path="/report" element={<FinancialReportPage ledgerData={ledgerData} />} />
                         <Route path="/invoice" element={<InvoicePage invoices={invoiceData} setInvoiceData={setInvoiceData} />} />
