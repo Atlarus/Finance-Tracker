@@ -121,32 +121,51 @@ const [sortConfig, setSortConfig] = useState({
       }
   }, [calculateBalance, editingAccountCode, isAccountCodeUnique, ledgerData, newAccount, setLedgerData]);
 
-// Inside handleRemoveAccount function
-const handleRemoveAccount = useCallback((accountCode) => {
-    const confirmDeletion = window.confirm("Are you sure you want to delete this account?");
-    if (confirmDeletion) {
-        setLedgerData(ledgerData.filter((account) => account.accountCode !== accountCode));
-        setEditingAccountCode(null);
-        setNewAccount({
-            accountCode: '',
-            accountName: '',
-            accountType: '',
-            balance: 0,
-        });
-        console.log("Updated Ledger Data:", ledgerData);
-    }
-}, [ledgerData, setLedgerData]);
+    const handleRemoveAccount = useCallback((accountCode) => {
+        const confirmDeletion = window.confirm("Are you sure you want to delete this account?");
+            if (confirmDeletion) {
+                // Update the ledger data and wait for the state to be updated
+                setLedgerData((prevLedgerData) =>
+                    prevLedgerData.filter((account) => account.accountCode !== accountCode)
+                );
 
-    const handleRowClick = (accountCode) => {
-        // Toggle the visibility of entries for the selected account
-        const updatedLedgerData = ledgerData.map((account) => {
-            if (account.accountCode === accountCode) {
-                return { ...account, showEntries: !account.showEntries };
+                // Reset editing state and log the updated data after the state is updated
+                setEditingAccountCode(null);
+                setNewAccount({
+                    accountCode: '',
+                    accountName: '',
+                    accountType: '',
+                    balance: 0,
+                });
+
+                // Log the updated data after the state is updated
+                console.log("Updated Ledger Data:", ledgerData);
             }
-            return account;
-        });
-        setLedgerData(updatedLedgerData);
-    };
+        }, [ledgerData, setLedgerData, setEditingAccountCode, setNewAccount]);
+
+        const handleRowClick = (accountCode, event) => {
+            // Check if the click event originated from an action button
+            const isActionButtonClick = event.target.tagName === 'BUTTON';
+        
+            if (!isActionButtonClick) {
+                // Find the selected account
+                const selectedAccount = ledgerData.find((account) => account.accountCode === accountCode);
+        
+                // Check if the account exists
+                if (selectedAccount) {
+                    // Toggle the visibility of entries for the selected account
+                    const updatedLedgerData = ledgerData.map((account) => {
+                        if (account.accountCode === accountCode) {
+                            return { ...account, showEntries: !account.showEntries };
+                        }
+                        return account;
+                    });
+                    setLedgerData(updatedLedgerData);
+                }
+            }
+        };
+        
+        
 
     const handleEditEntry = (entryId) => {
       setEditingEntryId(entryId);
@@ -267,7 +286,7 @@ useEffect(() => {
                         <React.Fragment key={account.accountCode}>
                             <tr
                                 className={`hover:bg-blue-200 transition duration-300 ${account.showEntries ? 'bg-blue-100' : ''}`}
-                                onClick={() => handleRowClick(account.accountCode)}
+                                onClick={(event) => handleRowClick(account.accountCode, event)}
                                 style={{ cursor: 'pointer' }}
                             >
                                 <td className="py-2 px-4 border-b text-center">
