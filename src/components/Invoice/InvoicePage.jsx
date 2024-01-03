@@ -1,8 +1,8 @@
 // InvoicePage.jsx
 
 import React from 'react';
-import InvoiceForm from './components/actions/InvoiceForm';
-import InvoiceTracker from './components/actions/InvoiceTracker';
+import InvoiceForm from './actions/InvoiceForm';
+import InvoiceTracker from './actions/InvoiceTracker';
 
 const InvoicePage = ({ invoices, setInvoiceData }) => {
   return (

@@ -2,10 +2,10 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { HashRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import InvoicePage from './pages/InvoicePage';
-import BudgetForecastPage from './pages/BudgetForecastPage';
-import FinancialReportPage from './pages/FinancialReportPage';
-import GeneralLedgerPage from './pages/GeneralLedgerPage';
+import InvoicePage from './components/Invoice/InvoicePage';
+import BudgetForecastPage from './components/Budget/BudgetForecastPage';
+import FinancialReportPage from './components/Report/FinancialReportPage';
+import GeneralLedgerPage from './components/Ledger/GeneralLedgerPage';
 
 const App = () => {
     // Dummy ledger data for demonstration
