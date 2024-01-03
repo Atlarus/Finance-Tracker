@@ -4,173 +4,176 @@ import React, { useState, useEffect, useCallback } from 'react';
 import isEqual from 'lodash/isEqual';
 
 const GeneralLedgerPage = ({ ledgerData, setLedgerData }) => {
-  const [editingAccountCode, setEditingAccountCode] = useState(null);
-  const [newAccount, setNewAccount] = useState({
-      accountCode: '',
-      accountName: '',
-      accountType: '',
-      balance: 0,
-  });
+    const [editingAccountCode, setEditingAccountCode] = useState(null);
+    const [newAccount, setNewAccount] = useState({
+        accountCode: '',
+        accountName: '',
+        accountType: '',
+        balance: 0,
+    });
 
-  const [editingEntryId, setEditingEntryId] = useState(null);
-  const [newEntry, setNewEntry] = useState({
-      id: '',
-      date: '',
-      description: '',
-      debit: 0,
-      credit: 0,
-  });
+    const [editingEntryId, setEditingEntryId] = useState(null);
+    const [newEntry, setNewEntry] = useState({
+        id: '',
+        date: '',
+        description: '',
+        debit: 0,
+        credit: 0,
+    });
 
-  const [selectedAccountCode, setSelectedAccountCode] = useState(null);
+    const [selectedAccountCode, setSelectedAccountCode] = useState(null);
 
-  const allEntries = ledgerData.flatMap((account) =>
-    account.entries.map((entry) => ({
-        accountCode: account.accountCode,
-        ...entry,
-    }))
+    const allEntries = ledgerData.flatMap((account) =>
+        account.entries.map((entry) => ({
+            accountCode: account.accountCode,
+            ...entry,
+        }))
     );
 
-  const calculateBalance = useCallback((entries) => {
-    const total = entries.reduce((total, entry) => total + (parseFloat(entry.debit) - parseFloat(entry.credit)), 0);
-    return parseFloat(total.toFixed(2));
-}, []);
+    const calculateBalance = useCallback((entries) => {
+        const total = entries.reduce((total, entry) => total + (parseFloat(entry.debit) - parseFloat(entry.credit)), 0);
+        return parseFloat(total.toFixed(2));
+    }, []);
 
-const [sortConfig, setSortConfig] = useState({
-    key: 'date',
-    direction: 'desc', // default sorting direction
-  });
-  
-  const sortedEntries = allEntries.slice().sort((a, b) => {
-    const direction = sortConfig.direction === 'asc' ? 1 : -1;
-  
-    if (a[sortConfig.key] < b[sortConfig.key]) {
-      return -1 * direction;
-    }
-    if (a[sortConfig.key] > b[sortConfig.key]) {
-      return 1 * direction;
-    }
-    return 0;
-  });
-  
-  const requestSort = (key) => {
-    let direction = 'asc';
-    if (sortConfig.key === key && sortConfig.direction === 'asc') {
-      direction = 'desc';
-    }
-    setSortConfig({ key, direction });
-  };
-  
-  const getSortIndicator = (columnKey) => {
-    if (sortConfig.key === columnKey) {
-      return sortConfig.direction === 'asc' ? '↑' : '↓';
-    }
-    return '';
-  };
+    const [sortConfig, setSortConfig] = useState({
+        key: 'date',
+        direction: 'desc', // default sorting direction
+    });
+
+    const sortedEntries = allEntries.slice().sort((a, b) => {
+        const direction = sortConfig.direction === 'asc' ? 1 : -1;
+
+        if (a[sortConfig.key] < b[sortConfig.key]) {
+            return -1 * direction;
+        }
+        if (a[sortConfig.key] > b[sortConfig.key]) {
+            return 1 * direction;
+        }
+        return 0;
+    });
+
+    const requestSort = (key) => {
+        let direction = 'asc';
+        if (sortConfig.key === key && sortConfig.direction === 'asc') {
+            direction = 'desc';
+        }
+        setSortConfig({ key, direction });
+    };
+
+    const getSortIndicator = (columnKey) => {
+        if (sortConfig.key === columnKey) {
+            return sortConfig.direction === 'asc' ? '↑' : '↓';
+        }
+        return '';
+    };
 
     // Define the types for the dropdown
     const accountTypes = ['Asset', 'Liability', 'Equity', 'Income', 'Expense'];
 
     const isAccountCodeUnique = useCallback((code) => {
-      return !ledgerData.some((account) => account.accountCode === code);
-  }, [ledgerData]);
+        return !ledgerData.some((account) => account.accountCode === code);
+    }, [ledgerData]);
 
     const handleAddAccount = useCallback(() => {
-      if (isAccountCodeUnique(newAccount.accountCode)) {
-          const newAccountWithBalance = {
-              ...newAccount,
-              id: Date.now(),
-              entries: [],
-              showEntries: false,
-              balance: 0,
-          };
-          setLedgerData([...ledgerData, newAccountWithBalance]);
-          setNewAccount({
-              accountCode: '',
-              accountName: '',
-              accountType: '',
-              balance: 0,
-          });
-      } else {
-          alert("Error: Account code must be unique.");
-      }
-  }, [isAccountCodeUnique, ledgerData, newAccount, setLedgerData]);
+        if (isAccountCodeUnique(newAccount.accountCode)) {
+            const newAccountWithBalance = {
+                ...newAccount,
+                id: Date.now(),
+                entries: [],
+                showEntries: false,
+                balance: 0,
+            };
+            setLedgerData([...ledgerData, newAccountWithBalance]);
+            setNewAccount({
+                accountCode: '',
+                accountName: '',
+                accountType: '',
+                balance: 0,
+            });
+        } else {
+            alert("Error: Account code must be unique.");
+        }
+    }, [isAccountCodeUnique, ledgerData, newAccount, setLedgerData]);
 
-  const handleEditAccount = useCallback((accountCode) => {
-    setEditingAccountCode(accountCode);
-    const accountToEdit = ledgerData.find((account) => account.accountCode === accountCode);
-    setNewAccount({ ...accountToEdit });
-}, [ledgerData]);
+    const handleEditAccount = useCallback((accountCode) => {
+        setEditingAccountCode(accountCode);
+        const accountToEdit = ledgerData.find((account) => account.accountCode === accountCode);
+        setNewAccount({ ...accountToEdit });
+    }, [ledgerData]);
 
     const handleUpdateAccount = useCallback(() => {
-      if (isAccountCodeUnique(newAccount.accountCode)) {
-          const updatedLedgerData = ledgerData.map((account) => {
-              return account.accountCode === editingAccountCode
-                  ? { ...newAccount, entries: account.entries, showEntries: account.showEntries, balance: calculateBalance(account.entries) }
-                  : account;
-          });
-          setLedgerData(updatedLedgerData);
-          setEditingAccountCode(null);
-          setNewAccount({
-              accountCode: '',
-              accountName: '',
-              accountType: '',
-              balance: 0,
-          });
-      } else {
-          alert("Error: Account code must be unique.");
-      }
-  }, [calculateBalance, editingAccountCode, isAccountCodeUnique, ledgerData, newAccount, setLedgerData]);
+        if (isAccountCodeUnique(newAccount.accountCode)) {
+            const updatedLedgerData = ledgerData.map((account) => {
+                return account.accountCode === editingAccountCode
+                    ? { ...newAccount, entries: account.entries, showEntries: account.showEntries, balance: calculateBalance(account.entries) }
+                    : account;
+            });
+            setLedgerData(updatedLedgerData);
+            setEditingAccountCode(null);
+            setNewAccount({
+                accountCode: '',
+                accountName: '',
+                accountType: '',
+                balance: 0,
+            });
+        } else {
+            alert("Error: Account code must be unique.");
+        }
+    }, [calculateBalance, editingAccountCode, isAccountCodeUnique, ledgerData, newAccount, setLedgerData]);
 
     const handleRemoveAccount = useCallback((accountCode) => {
         const confirmDeletion = window.confirm("Are you sure you want to delete this account?");
-            if (confirmDeletion) {
-                // Update the ledger data and wait for the state to be updated
-                setLedgerData((prevLedgerData) =>
-                    prevLedgerData.filter((account) => account.accountCode !== accountCode)
-                );
+        if (confirmDeletion) {
+            // Update the ledger data and wait for the state to be updated
+            setLedgerData((prevLedgerData) =>
+                prevLedgerData.filter((account) => account.accountCode !== accountCode)
+            );
 
-                // Reset editing state and log the updated data after the state is updated
-                setEditingAccountCode(null);
-                setNewAccount({
-                    accountCode: '',
-                    accountName: '',
-                    accountType: '',
-                    balance: 0,
+            // Reset editing state and log the updated data after the state is updated
+            setEditingAccountCode(null);
+            setNewAccount({
+                accountCode: '',
+                accountName: '',
+                accountType: '',
+                balance: 0,
+            });
+
+            // Log the updated data after the state is updated
+            console.log("Updated Ledger Data:", ledgerData);
+        }
+    }, [ledgerData, setLedgerData, setEditingAccountCode, setNewAccount]);
+
+    const handleRowClick = (accountCode, event) => {
+        // Check if editing mode is active
+        if (editingAccountCode !== null || editingEntryId !== null) {
+            return; // Do nothing when editing mode is active
+        }
+    
+        // Check if the click event originated from an action button
+        const isActionButtonClick = event.target.tagName === 'BUTTON';
+    
+        if (!isActionButtonClick) {
+            // Find the selected account
+            const selectedAccount = ledgerData.find((account) => account.accountCode === accountCode);
+    
+            // Check if the account exists and not in editing mode
+            if (selectedAccount && editingAccountCode === null) {
+                // Toggle the visibility of entries for the selected account
+                const updatedLedgerData = ledgerData.map((account) => {
+                    if (account.accountCode === accountCode) {
+                        return { ...account, showEntries: !account.showEntries };
+                    }
+                    return account;
                 });
-
-                // Log the updated data after the state is updated
-                console.log("Updated Ledger Data:", ledgerData);
+                setLedgerData(updatedLedgerData);
             }
-        }, [ledgerData, setLedgerData, setEditingAccountCode, setNewAccount]);
-
-        const handleRowClick = (accountCode, event) => {
-            // Check if the click event originated from an action button
-            const isActionButtonClick = event.target.tagName === 'BUTTON';
-        
-            if (!isActionButtonClick) {
-                // Find the selected account
-                const selectedAccount = ledgerData.find((account) => account.accountCode === accountCode);
-        
-                // Check if the account exists
-                if (selectedAccount) {
-                    // Toggle the visibility of entries for the selected account
-                    const updatedLedgerData = ledgerData.map((account) => {
-                        if (account.accountCode === accountCode) {
-                            return { ...account, showEntries: !account.showEntries };
-                        }
-                        return account;
-                    });
-                    setLedgerData(updatedLedgerData);
-                }
-            }
-        };
-        
-        
+        }
+    };    
 
     const handleEditEntry = (entryId) => {
-      setEditingEntryId(entryId);
-      const entryToEdit = ledgerData.flatMap((account) => account.entries).find((entry) => entry.id === entryId);
-      setNewEntry({ ...entryToEdit });
+        setEditingEntryId(entryId);
+        const entryToEdit = ledgerData.flatMap((account) => account.entries).find((entry) => entry.id === entryId);
+        setNewEntry({ ...entryToEdit });
     };
 
     const handleUpdateEntry = () => {
@@ -184,7 +187,7 @@ const [sortConfig, setSortConfig] = useState({
                 balance: parseFloat(calculateBalance(updatedEntries).toFixed(2)), // Round the balance
             };
         });
-    
+
         setLedgerData(updatedLedgerData);
         setEditingEntryId(null);
         setNewEntry({
@@ -196,49 +199,18 @@ const [sortConfig, setSortConfig] = useState({
         });
     };
 
-  const handleRemoveEntry = (entryId) => {
-    const updatedLedgerData = ledgerData.map((account) => {
-        const updatedEntries = account.entries.filter((entry) => entry.id !== entryId);
-        return {
-            ...account,
-            entries: updatedEntries,
-            balance: calculateBalance(updatedEntries),
-        };
-    });
-
-    setLedgerData(updatedLedgerData);
-    setEditingEntryId(null);
-    setNewEntry({
-        id: '',
-        date: '',
-        description: '',
-        debit: 0,
-        credit: 0,
-    });
-};
-
-// Inside handleAddEntry function
-const handleAddEntry = () => {
-    if (selectedAccountCode) {
+    const handleRemoveEntry = (entryId) => {
         const updatedLedgerData = ledgerData.map((account) => {
-            if (account.accountCode === selectedAccountCode) {
-                const newEntryWithId = {
-                    ...newEntry,
-                    id: Date.now(),
-                    debit: parseFloat(newEntry.debit), // Ensure debit is treated as a number
-                    credit: parseFloat(newEntry.credit), // Ensure credit is treated as a number
-                };
-                const updatedEntries = [...account.entries, newEntryWithId];
-                return {
-                    ...account,
-                    entries: updatedEntries,
-                    balance: calculateBalance(updatedEntries),
-                };
-            }
-            return account;
+            const updatedEntries = account.entries.filter((entry) => entry.id !== entryId);
+            return {
+                ...account,
+                entries: updatedEntries,
+                balance: calculateBalance(updatedEntries),
+            };
         });
 
         setLedgerData(updatedLedgerData);
+        setEditingEntryId(null);
         setNewEntry({
             id: '',
             date: '',
@@ -246,27 +218,58 @@ const handleAddEntry = () => {
             debit: 0,
             credit: 0,
         });
-    } else {
-        alert("Please select an account before adding an entry.");
-    }
-};
+    };
+
+    // Inside handleAddEntry function
+    const handleAddEntry = () => {
+        if (selectedAccountCode) {
+            const updatedLedgerData = ledgerData.map((account) => {
+                if (account.accountCode === selectedAccountCode) {
+                    const newEntryWithId = {
+                        ...newEntry,
+                        id: Date.now(),
+                        debit: parseFloat(newEntry.debit), // Ensure debit is treated as a number
+                        credit: parseFloat(newEntry.credit), // Ensure credit is treated as a number
+                    };
+                    const updatedEntries = [...account.entries, newEntryWithId];
+                    return {
+                        ...account,
+                        entries: updatedEntries,
+                        balance: calculateBalance(updatedEntries),
+                    };
+                }
+                return account;
+            });
+
+            setLedgerData(updatedLedgerData);
+            setNewEntry({
+                id: '',
+                date: '',
+                description: '',
+                debit: 0,
+                credit: 0,
+            });
+        } else {
+            alert("Please select an account before adding an entry.");
+        }
+    };
 
 
-useEffect(() => {
-    console.log("useEffect triggered");
+    useEffect(() => {
+        console.log("useEffect triggered");
 
-    // Calculate balances for all accounts
-    const updatedLedgerData = ledgerData.map((account) => ({
-        ...account,
-        balance: calculateBalance(account.entries),
-    }));
+        // Calculate balances for all accounts
+        const updatedLedgerData = ledgerData.map((account) => ({
+            ...account,
+            balance: calculateBalance(account.entries),
+        }));
 
-    // Update ledgerData only if there's a change
-    if (!isEqual(ledgerData, updatedLedgerData)) {
-        setLedgerData(updatedLedgerData);
-    }
+        // Update ledgerData only if there's a change
+        if (!isEqual(ledgerData, updatedLedgerData)) {
+            setLedgerData(updatedLedgerData);
+        }
 
-}, [calculateBalance, ledgerData, setLedgerData]);
+    }, [calculateBalance, ledgerData, setLedgerData]);
 
     return (
         <div className="p-4">
@@ -382,85 +385,85 @@ useEffect(() => {
                                                 {account.entries.map((entry) => (
                                                     <tr key={entry.id}>
                                                         <td className="py-2 px-4 border-b">
-                                                          {editingEntryId === entry.id ? (
-                                                            <input
-                                                            type="date"
-                                                            value={newEntry.date}
-                                                            onChange={(e) => setNewEntry({ ...newEntry, date: e.target.value })}
-                                                            className="mt-1 p-2 border rounded-md w-full focus:outline-none focus:ring focus:border-blue-300"
-                                                            />
-                                                          ) : (
-                                                          entry.date
-                                                          )}
+                                                            {editingEntryId === entry.id ? (
+                                                                <input
+                                                                    type="date"
+                                                                    value={newEntry.date}
+                                                                    onChange={(e) => setNewEntry({ ...newEntry, date: e.target.value })}
+                                                                    className="mt-1 p-2 border rounded-md w-full focus:outline-none focus:ring focus:border-blue-300"
+                                                                />
+                                                            ) : (
+                                                                entry.date
+                                                            )}
                                                         </td>
                                                         <td className="py-2 px-4 border-b">
-                                                          {editingEntryId === entry.id ? (
-                                                            <input
-                                                            type="text"
-                                                            value={newEntry.description}
-                                                            onChange={(e) => setNewEntry({ ...newEntry, description: e.target.value })}
-                                                            className="mt-1 p-2 border rounded-md w-full focus:outline-none focus:ring focus:border-blue-300"
-                                                            />
-                                                          ) : (
-                                                          entry.description
-                                                          )}
+                                                            {editingEntryId === entry.id ? (
+                                                                <input
+                                                                    type="text"
+                                                                    value={newEntry.description}
+                                                                    onChange={(e) => setNewEntry({ ...newEntry, description: e.target.value })}
+                                                                    className="mt-1 p-2 border rounded-md w-full focus:outline-none focus:ring focus:border-blue-300"
+                                                                />
+                                                            ) : (
+                                                                entry.description
+                                                            )}
                                                         </td>
                                                         <td className="py-2 px-4 border-b text-left">
-                                                          {editingEntryId === entry.id ? (
-                                                            <input
-                                                            type="number"
-                                                            value={newEntry.debit}
-                                                            onChange={(e) => setNewEntry({ ...newEntry, debit: e.target.value })}
-                                                            className="mt-1 p-2 border rounded-md w-full focus:outline-none focus:ring focus:border-blue-300"
-                                                            />
-                                                          ) : (
-                                                            parseFloat(entry.debit).toFixed(2)
-                                                          )}
+                                                            {editingEntryId === entry.id ? (
+                                                                <input
+                                                                    type="number"
+                                                                    value={newEntry.debit}
+                                                                    onChange={(e) => setNewEntry({ ...newEntry, debit: e.target.value })}
+                                                                    className="mt-1 p-2 border rounded-md w-full focus:outline-none focus:ring focus:border-blue-300"
+                                                                />
+                                                            ) : (
+                                                                parseFloat(entry.debit).toFixed(2)
+                                                            )}
                                                         </td>
                                                         <td className="py-2 px-4 border-b text-left">
-                                                          {editingEntryId === entry.id ? (
-                                                            <input
-                                                            type="number"
-                                                            value={newEntry.credit}
-                                                            onChange={(e) => setNewEntry({ ...newEntry, credit: e.target.value })}
-                                                            className="mt-1 p-2 border rounded-md w-full focus:outline-none focus:ring focus:border-blue-300"
-                                                            />
-                                                          ) : (
-                                                            parseFloat(entry.credit).toFixed(2)
-                                                          )}
+                                                            {editingEntryId === entry.id ? (
+                                                                <input
+                                                                    type="number"
+                                                                    value={newEntry.credit}
+                                                                    onChange={(e) => setNewEntry({ ...newEntry, credit: e.target.value })}
+                                                                    className="mt-1 p-2 border rounded-md w-full focus:outline-none focus:ring focus:border-blue-300"
+                                                                />
+                                                            ) : (
+                                                                parseFloat(entry.credit).toFixed(2)
+                                                            )}
                                                         </td>
                                                         <td className="py-2 px-4 border-b">
-                                                          {editingEntryId === entry.id ? (
-                                                            <div className="flex space-x-2">
-                                                                <button
-                                                                    onClick={handleUpdateEntry}
-                                                                    className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-700"
-                                                                >
-                                                                    Update
-                                                                </button>
-                                                                <button
-                                                                    onClick={() => setEditingEntryId(null)}
-                                                                    className="bg-gray-500 text-white py-2 px-4 rounded-md hover:bg-gray-700"
-                                                                >
-                                                                    Cancel
-                                                                </button>
-                                                            </div>
-                                                          ) : (
-                                                            <div className="flex space-x-2">
-                                                                <button
-                                                                    onClick={() => handleEditEntry(entry.id)}
-                                                                    className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-700"
-                                                                >
-                                                                    Edit
-                                                                </button>
-                                                                <button
-                                                                    onClick={() => handleRemoveEntry(entry.id)}
-                                                                    className="bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-700"
-                                                                >
-                                                                    Delete
-                                                                </button>
-                                                            </div>
-                                                        )}
+                                                            {editingEntryId === entry.id ? (
+                                                                <div className="flex space-x-2">
+                                                                    <button
+                                                                        onClick={handleUpdateEntry}
+                                                                        className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-700"
+                                                                    >
+                                                                        Update
+                                                                    </button>
+                                                                    <button
+                                                                        onClick={() => setEditingEntryId(null)}
+                                                                        className="bg-gray-500 text-white py-2 px-4 rounded-md hover:bg-gray-700"
+                                                                    >
+                                                                        Cancel
+                                                                    </button>
+                                                                </div>
+                                                            ) : (
+                                                                <div className="flex space-x-2">
+                                                                    <button
+                                                                        onClick={() => handleEditEntry(entry.id)}
+                                                                        className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-700"
+                                                                    >
+                                                                        Edit
+                                                                    </button>
+                                                                    <button
+                                                                        onClick={() => handleRemoveEntry(entry.id)}
+                                                                        className="bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-700"
+                                                                    >
+                                                                        Delete
+                                                                    </button>
+                                                                </div>
+                                                            )}
                                                         </td>
                                                     </tr>
                                                 ))}
@@ -474,40 +477,74 @@ useEffect(() => {
                 </tbody>
             </table>
 
-    {/* All Entries Table */}
-    <h2 className="text-xl font-bold mb-2 text-gray-800">All Entries</h2>
-    <table className="min-w-full bg-blue-50 border border-blue-200">
-      <thead>
-        <tr className="bg-blue-100">
-          <th onClick={() => requestSort('accountCode')} className="py-2 px-4 border-b text-left cursor-pointer">
-            Account Code {getSortIndicator('accountCode')}
-          </th>
-          <th onClick={() => requestSort('date')} className="py-2 px-4 border-b text-left cursor-pointer">
-            Date {getSortIndicator('date')}
-          </th>
-          <th onClick={() => requestSort('description')} className="py-2 px-4 border-b text-left cursor-pointer">
-            Description {getSortIndicator('description')}
-          </th>
-          <th onClick={() => requestSort('debit')} className="py-2 px-4 border-b text-left cursor-pointer">
-            Debit {getSortIndicator('debit')}
-          </th>
-          <th onClick={() => requestSort('credit')} className="py-2 px-4 border-b text-left cursor-pointer">
-            Credit {getSortIndicator('credit')}
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        {sortedEntries.map((entry) => (
-          <tr key={entry.id}>
-            <td className="py-2 px-4 border-b">{entry.accountCode}</td>
-            <td className="py-2 px-4 border-b">{entry.date}</td>
-            <td className="py-2 px-4 border-b">{entry.description}</td>
-            <td className="py-2 px-4 border-b">{parseFloat(entry.debit).toFixed(2)}</td>
-            <td className="py-2 px-4 border-b">{parseFloat(entry.credit).toFixed(2)}</td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
+            {/* All Entries Table */}
+            <h2 className="text-xl font-bold mb-2 text-gray-800">All Entries</h2>
+            <table className="min-w-full bg-blue-50 border border-blue-200">
+                <thead>
+                    <tr className="bg-blue-100">
+                        <th onClick={() => requestSort('accountCode')} className="py-2 px-4 border-b text-left cursor-pointer">
+                            Account Code {getSortIndicator('accountCode')}
+                        </th>
+                        <th onClick={() => requestSort('date')} className="py-2 px-4 border-b text-left cursor-pointer">
+                            Date {getSortIndicator('date')}
+                        </th>
+                        <th onClick={() => requestSort('description')} className="py-2 px-4 border-b text-left cursor-pointer">
+                            Description {getSortIndicator('description')}
+                        </th>
+                        <th onClick={() => requestSort('debit')} className="py-2 px-4 border-b text-left cursor-pointer">
+                            Debit {getSortIndicator('debit')}
+                        </th>
+                        <th onClick={() => requestSort('credit')} className="py-2 px-4 border-b text-left cursor-pointer">
+                            Credit {getSortIndicator('credit')}
+                        </th>
+                        <th className="py-2 px-4 border-b text-left">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {sortedEntries.map((entry) => (
+                        <tr key={entry.id}>
+                            <td className="py-2 px-4 border-b">{entry.accountCode}</td>
+                            <td className="py-2 px-4 border-b">{entry.date}</td>
+                            <td className="py-2 px-4 border-b">{entry.description}</td>
+                            <td className="py-2 px-4 border-b">{parseFloat(entry.debit).toFixed(2)}</td>
+                            <td className="py-2 px-4 border-b">{parseFloat(entry.credit).toFixed(2)}</td>
+                            <td className="py-2 px-4 border-b">
+                                {editingEntryId === entry.id ? (
+                                    <div className="flex space-x-2">
+                                        <button
+                                            onClick={handleUpdateEntry}
+                                            className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-700"
+                                        >
+                                            Update
+                                        </button>
+                                        <button
+                                            onClick={() => setEditingEntryId(null)}
+                                            className="bg-gray-500 text-white py-2 px-4 rounded-md hover:bg-gray-700"
+                                        >
+                                            Cancel
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <div className="flex space-x-2">
+                                        <button
+                                            onClick={() => handleEditEntry(entry.id)}
+                                            className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-700"
+                                        >
+                                            Edit
+                                        </button>
+                                        <button
+                                            onClick={() => handleRemoveEntry(entry.id)}
+                                            className="bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-700"
+                                        >
+                                            Delete
+                                        </button>
+                                    </div>
+                                )}
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
+            </table>
 
             <div className="bg-blue-50 border border-blue-200 p-4 mb-4 mt-4 rounded-md">
                 <h2 className="text-xl font-bold mb-2 text-gray-800">Add New Account</h2>
@@ -554,7 +591,7 @@ useEffect(() => {
                 </div>
             </div>
             <div className="bg-blue-50 border border-blue-200 p-4 mb-4 mt-4 rounded-md">
-            <h2 className="text-xl font-bold mb-2 text-gray-800">Add New Entry</h2>
+                <h2 className="text-xl font-bold mb-2 text-gray-800">Add New Entry</h2>
                 <div className="space-y-2">
                     <div>
                         {/* New dropdown for selecting the account */}
