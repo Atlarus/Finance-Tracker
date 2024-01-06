@@ -145,15 +145,15 @@ const App = () => {
                 <Routes>
                     <Route path="/" exact>
                         <Route index element={<GeneralLedgerPage ledgerData={ledgerData} setLedgerData={setLedgerData} />} />
-                        <Route path="/budget" element={<BudgetForecastPage ledgerData={ledgerData} />} />
-                        <Route path="/report" element={<FinancialReportPage ledgerData={ledgerData} />} />
-                        <Route path="/invoice" element={<InvoicePage invoices={invoiceData} setInvoiceData={setInvoiceData} />} />
                         {/* <Route path="/inventory" element={} />
                         <Route path="/vendors" element={} />
                         <Route path="/management" element={} />
                         <Route path="/settings" element={} />
                         <Route path="/auth" element={} /> */}
                     </Route>
+                    <Route path="budget" element={<BudgetForecastPage ledgerData={ledgerData} />} />
+                    <Route path="report" element={<FinancialReportPage ledgerData={ledgerData} />} />
+                    <Route path="invoice" element={<InvoicePage invoices={invoiceData} setInvoiceData={setInvoiceData} />} />
                 </Routes>
             </div>
         </Router>
