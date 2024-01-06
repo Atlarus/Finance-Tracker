@@ -131,19 +131,28 @@ const App = () => {
             <div className="font-sans min-h-screen flex flex-col">
                 <nav className="bg-gray-800 text-white p-4">
                     <ul className="flex space-x-4">
-                        <li><Link to="/invoice" className="hover:text-gray-300">Invoice</Link></li>
                         <li><Link to="/" className="hover:text-gray-300">General Ledger</Link></li>
+                        <li><Link to="/invoice" className="hover:text-gray-300">Invoice</Link></li>
                         <li><Link to="/budget" className="hover:text-gray-300">Budgeting and Forecasting</Link></li>
                         <li><Link to="/report" className="hover:text-gray-300">Financial Report</Link></li>
+                        <li><Link to="/inventory" className="hove:text-gray-300">Inventory</Link></li>
+                        <li><Link to="/vendors" className="hove:text-gray-300">Vendors</Link></li>
+                        <li><Link to="/management" className="hove:text-gray-300">Management</Link></li>
+                        <li><Link to="/settings" className="hove:text-gray-300">Settings</Link></li>
+                        <li><Link to="/auth" className="hove:text-gray-300">Login</Link></li>
                     </ul>
                 </nav>
                 <Routes>
                     <Route path="/" exact>
                         <Route index element={<GeneralLedgerPage ledgerData={ledgerData} setLedgerData={setLedgerData} />} />
-                        <Route path="/Finance-Tracker" element={<GeneralLedgerPage ledgerData={ledgerData} setLedgerData={setLedgerData} />} />
                         <Route path="/budget" element={<BudgetForecastPage ledgerData={ledgerData} />} />
                         <Route path="/report" element={<FinancialReportPage ledgerData={ledgerData} />} />
                         <Route path="/invoice" element={<InvoicePage invoices={invoiceData} setInvoiceData={setInvoiceData} />} />
+                        <Route path="/inventory" element={} />
+                        <Route path="/vendors" element={} />
+                        <Route path="/management" element={} />
+                        <Route path="/settings" element={} />
+                        <Route path="/auth" element={} />
                     </Route>
                 </Routes>
             </div>
