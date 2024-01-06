@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo } from 'react';
 import { HashRouter as Router, Routes, Route, Link } from 'react-router-dom';
-import InvoicePage from './components/Invoice/InvoicePage';
+import InvoicePage from './components/Documents/Invoice/InvoicePage';
 import BudgetForecastPage from './components/Budget/BudgetForecastPage';
 import FinancialReportPage from './components/Report/FinancialReportPage';
 import GeneralLedgerPage from './components/Ledger/GeneralLedgerPage';
@@ -148,11 +148,11 @@ const App = () => {
                         <Route path="/budget" element={<BudgetForecastPage ledgerData={ledgerData} />} />
                         <Route path="/report" element={<FinancialReportPage ledgerData={ledgerData} />} />
                         <Route path="/invoice" element={<InvoicePage invoices={invoiceData} setInvoiceData={setInvoiceData} />} />
-                        <Route path="/inventory" element={} />
+                        {/* <Route path="/inventory" element={} />
                         <Route path="/vendors" element={} />
                         <Route path="/management" element={} />
                         <Route path="/settings" element={} />
-                        <Route path="/auth" element={} />
+                        <Route path="/auth" element={} /> */}
                     </Route>
                 </Routes>
             </div>
