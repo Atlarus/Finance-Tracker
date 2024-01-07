@@ -274,241 +274,245 @@ const GeneralLedgerPage = ({ ledgerData, setLedgerData }) => {
     return (
         <div className="p-4">
             <h1 className="text-3xl font-bold mb-4 text-gray-800">General Ledger</h1>
-            <table className="min-w-full bg-blue-50 border border-blue-200">
-                <thead>
-                    <tr className="bg-blue-100">
-                        <th className="py-2 px-4 border-b text-left">Account Code</th>
-                        <th className="py-2 px-4 border-b text-left">Account Name</th>
-                        <th className="py-2 px-4 border-b text-left">Account Type</th>
-                        <th className="py-2 px-4 border-b text-left">Balance</th>
-                        <th className="py-2 px-4 border-b text-left">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {ledgerData.map((account) => (
-                        <React.Fragment key={account.accountCode}>
-                            <tr
-                                className={`hover:bg-blue-200 transition duration-300 ${account.showEntries ? 'bg-blue-100' : ''}`}
-                                onClick={(event) => handleRowClick(account.accountCode, event)}
-                                style={{ cursor: 'pointer' }}
-                            >
-                                <td className="py-2 px-4 border-b text-center">
-                                    {editingAccountCode === account.accountCode ? (
-                                        <input
-                                            type="text"
-                                            value={newAccount.accountCode}
-                                            onChange={(e) => setNewAccount({ ...newAccount, accountCode: e.target.value })}
-                                            className="mt-1 p-2 border rounded-md w-full focus:outline-none focus:ring focus:border-blue-300"
-                                        />
-                                    ) : (
-                                        account.accountCode
-                                    )}
-                                </td>
-                                <td className="py-2 px-4 border-b text-left">
-                                    {editingAccountCode === account.accountCode ? (
-                                        <input
-                                            type="text"
-                                            value={newAccount.accountName}
-                                            onChange={(e) => setNewAccount({ ...newAccount, accountName: e.target.value })}
-                                            className="mt-1 p-2 border rounded-md w-full focus:outline-none focus:ring focus:border-blue-300"
-                                        />
-                                    ) : (
-                                        account.accountName
-                                    )}
-                                </td>
-                                <td className="py-2 px-4 border-b text-left">
-                                    {editingAccountCode === account.accountCode ? (
-                                        <select
-                                            value={newAccount.accountType}
-                                            onChange={(e) => setNewAccount({ ...newAccount, accountType: e.target.value })}
-                                            className="mt-1 p-2 border rounded-md w-full focus:outline-none focus:ring focus:border-blue-300"
-                                        >
-                                            {accountTypes.map((type) => (
-                                                <option key={type} value={type}>
-                                                    {type}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    ) : (
-                                        account.accountType
-                                    )}
-                                </td>
-                                <td className="py-2 px-4 border-b text-left">{parseFloat(account.balance).toFixed(2)}</td>
-                                <td className="py-2 px-4 border-b">
-                                    {editingAccountCode === account.accountCode ? (
-                                        <div className="flex space-x-2">
-                                            <button
-                                                onClick={handleUpdateAccount}
-                                                className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-700"
+            <div className="shadow-lg border-t rounded-md">
+                <table className="min-w-full">
+                    <thead>
+                        <tr className="bg-primary">
+                            <th className="py-2 px-4 text-left">Account Code</th>
+                            <th className="py-2 px-4 text-left">Account Name</th>
+                            <th className="py-2 px-4 text-left">Account Type</th>
+                            <th className="py-2 px-4 text-left">Balance</th>
+                            <th className="py-2 px-4 text-left">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {ledgerData.map((account) => (
+                            <React.Fragment key={account.accountCode}>
+                                <tr
+                                    className={`hover:bg-blue-200 transition duration-300 ${account.showEntries ? 'bg-blue-100' : ''}`}
+                                    onClick={(event) => handleRowClick(account.accountCode, event)}
+                                    style={{ cursor: 'pointer' }}
+                                >
+                                    <td className="py-2 px-4 text-center">
+                                        {editingAccountCode === account.accountCode ? (
+                                            <input
+                                                type="text"
+                                                value={newAccount.accountCode}
+                                                onChange={(e) => setNewAccount({ ...newAccount, accountCode: e.target.value })}
+                                                className="mt-1 p-2 border rounded-md w-full focus:outline-none focus:ring focuslue-300"
+                                            />
+                                        ) : (
+                                            account.accountCode
+                                        )}
+                                    </td>
+                                    <td className="py-2 px-4 text-left">
+                                        {editingAccountCode === account.accountCode ? (
+                                            <input
+                                                type="text"
+                                                value={newAccount.accountName}
+                                                onChange={(e) => setNewAccount({ ...newAccount, accountName: e.target.value })}
+                                                className="mt-1 p-2 border rounded-md w-full focus:outline-none focus:ring focuslue-300"
+                                            />
+                                        ) : (
+                                            account.accountName
+                                        )}
+                                    </td>
+                                    <td className="py-2 px-4 text-left">
+                                        {editingAccountCode === account.accountCode ? (
+                                            <select
+                                                value={newAccount.accountType}
+                                                onChange={(e) => setNewAccount({ ...newAccount, accountType: e.target.value })}
+                                                className="mt-1 p-2 border rounded-md w-full focus:outline-none focus:ring focuslue-300"
                                             >
-                                                Update
-                                            </button>
-                                            <button
-                                                onClick={() => setEditingAccountCode(null)}
-                                                className="bg-gray-500 text-white py-2 px-4 rounded-md hover:bg-gray-700"
-                                            >
-                                                Cancel
-                                            </button>
-                                        </div>
-                                    ) : (
-                                        <div className="flex space-x-2">
-                                            <button
-                                                onClick={() => handleEditAccount(account.accountCode)}
-                                                className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-700"
-                                            >
-                                                Edit
-                                            </button>
-                                            <button
-                                                onClick={() => handleRemoveAccount(account.accountCode)}
-                                                className="bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-700"
-                                            >
-                                                Delete
-                                            </button>
-                                        </div>
-                                    )}
-                                </td>
-                            </tr>
-                            {account.showEntries && account.entries && account.entries.length > 0 && (
-                                <tr>
-                                    <td colSpan="5" className="py-2 px-4">
-                                        <table className="min-w-full bg-gray-100 border border-gray-300">
-                                            <thead>
-                                                <tr className="bg-gray-200">
-                                                    <th className="py-2 px-4 border-b text-left">Date</th>
-                                                    <th className="py-2 px-4 border-b text-left">Description</th>
-                                                    <th className="py-2 px-4 border-b text-left">Debit</th>
-                                                    <th className="py-2 px-4 border-b text-left">Credit</th>
-                                                    <th className="py-2 px-4 border-b text-left">Actions</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {account.entries.map((entry) => (
-                                                    <tr key={entry.id}>
-                                                        <td className="py-2 px-4 border-b">
-                                                            {editingEntryId === entry.id ? (
-                                                                <input
-                                                                    type="date"
-                                                                    value={newEntry.date}
-                                                                    onChange={(e) => setNewEntry({ ...newEntry, date: e.target.value })}
-                                                                    className="mt-1 p-2 border rounded-md w-full focus:outline-none focus:ring focus:border-blue-300"
-                                                                />
-                                                            ) : (
-                                                                entry.date
-                                                            )}
-                                                        </td>
-                                                        <td className="py-2 px-4 border-b">
-                                                            {editingEntryId === entry.id ? (
-                                                                <input
-                                                                    type="text"
-                                                                    value={newEntry.description}
-                                                                    onChange={(e) => setNewEntry({ ...newEntry, description: e.target.value })}
-                                                                    className="mt-1 p-2 border rounded-md w-full focus:outline-none focus:ring focus:border-blue-300"
-                                                                />
-                                                            ) : (
-                                                                entry.description
-                                                            )}
-                                                        </td>
-                                                        <td className="py-2 px-4 border-b text-left">
-                                                            {editingEntryId === entry.id ? (
-                                                                <input
-                                                                    type="number"
-                                                                    value={newEntry.debit}
-                                                                    onChange={(e) => setNewEntry({ ...newEntry, debit: e.target.value })}
-                                                                    className="mt-1 p-2 border rounded-md w-full focus:outline-none focus:ring focus:border-blue-300"
-                                                                />
-                                                            ) : (
-                                                                parseFloat(entry.debit).toFixed(2)
-                                                            )}
-                                                        </td>
-                                                        <td className="py-2 px-4 border-b text-left">
-                                                            {editingEntryId === entry.id ? (
-                                                                <input
-                                                                    type="number"
-                                                                    value={newEntry.credit}
-                                                                    onChange={(e) => setNewEntry({ ...newEntry, credit: e.target.value })}
-                                                                    className="mt-1 p-2 border rounded-md w-full focus:outline-none focus:ring focus:border-blue-300"
-                                                                />
-                                                            ) : (
-                                                                parseFloat(entry.credit).toFixed(2)
-                                                            )}
-                                                        </td>
-                                                        <td className="py-2 px-4 border-b">
-                                                            {editingEntryId === entry.id ? (
-                                                                <div className="flex space-x-2">
-                                                                    <button
-                                                                        onClick={handleUpdateEntry}
-                                                                        className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-700"
-                                                                    >
-                                                                        Update
-                                                                    </button>
-                                                                    <button
-                                                                        onClick={() => setEditingEntryId(null)}
-                                                                        className="bg-gray-500 text-white py-2 px-4 rounded-md hover:bg-gray-700"
-                                                                    >
-                                                                        Cancel
-                                                                    </button>
-                                                                </div>
-                                                            ) : (
-                                                                <div className="flex space-x-2">
-                                                                    <button
-                                                                        onClick={() => handleEditEntry(entry.id)}
-                                                                        className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-700"
-                                                                    >
-                                                                        Edit
-                                                                    </button>
-                                                                    <button
-                                                                        onClick={() => handleRemoveEntry(entry.id)}
-                                                                        className="bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-700"
-                                                                    >
-                                                                        Delete
-                                                                    </button>
-                                                                </div>
-                                                            )}
-                                                        </td>
-                                                    </tr>
+                                                {accountTypes.map((type) => (
+                                                    <option key={type} value={type}>
+                                                        {type}
+                                                    </option>
                                                 ))}
-                                            </tbody>
-                                        </table>
+                                            </select>
+                                        ) : (
+                                            account.accountType
+                                        )}
+                                    </td>
+                                    <td className="py-2 px-4 text-left">{parseFloat(account.balance).toFixed(2)}</td>
+                                    <td className="py-2 px-4">
+                                        {editingAccountCode === account.accountCode ? (
+                                            <div className="flex space-x-2">
+                                                <button
+                                                    onClick={handleUpdateAccount}
+                                                    className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-700"
+                                                >
+                                                    Update
+                                                </button>
+                                                <button
+                                                    onClick={() => setEditingAccountCode(null)}
+                                                    className="bg-gray-500 text-white py-2 px-4 rounded-md hover:bg-gray-700"
+                                                >
+                                                    Cancel
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            <div className="flex space-x-2">
+                                                <button
+                                                    onClick={() => handleEditAccount(account.accountCode)}
+                                                    className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-700"
+                                                >
+                                                    Edit
+                                                </button>
+                                                <button
+                                                    onClick={() => handleRemoveAccount(account.accountCode)}
+                                                    className="bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-700"
+                                                >
+                                                    Delete
+                                                </button>
+                                            </div>
+                                        )}
                                     </td>
                                 </tr>
-                            )}
-                        </React.Fragment>
-                    ))}
-                </tbody>
-            </table>
+                                {account.showEntries && account.entries && account.entries.length > 0 && (
+                                    <tr>
+                                        <td colSpan="5" className="py-2 px-4">
+                                            <table className="min-w-full bg-gray-100 border border-gray-300">
+                                                <thead>
+                                                    <tr className="bg-gray-200">
+                                                        <th className="py-2 px-4 text-left">Date</th>
+                                                        <th className="py-2 px-4 text-left">Description</th>
+                                                        <th className="py-2 px-4 text-left">Debit</th>
+                                                        <th className="py-2 px-4 text-left">Credit</th>
+                                                        <th className="py-2 px-4 text-left">Actions</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {account.entries.map((entry) => (
+                                                        <tr key={entry.id}>
+                                                            <td className="py-2 px-4">
+                                                                {editingEntryId === entry.id ? (
+                                                                    <input
+                                                                        type="date"
+                                                                        value={newEntry.date}
+                                                                        onChange={(e) => setNewEntry({ ...newEntry, date: e.target.value })}
+                                                                        className="mt-1 p-2 border rounded-md w-full focus:outline-none focus:ring focuslue-300"
+                                                                    />
+                                                                ) : (
+                                                                    entry.date
+                                                                )}
+                                                            </td>
+                                                            <td className="py-2 px-4">
+                                                                {editingEntryId === entry.id ? (
+                                                                    <input
+                                                                        type="text"
+                                                                        value={newEntry.description}
+                                                                        onChange={(e) => setNewEntry({ ...newEntry, description: e.target.value })}
+                                                                        className="mt-1 p-2 border rounded-md w-full focus:outline-none focus:ring focuslue-300"
+                                                                    />
+                                                                ) : (
+                                                                    entry.description
+                                                                )}
+                                                            </td>
+                                                            <td className="py-2 px-4 text-left">
+                                                                {editingEntryId === entry.id ? (
+                                                                    <input
+                                                                        type="number"
+                                                                        value={newEntry.debit}
+                                                                        onChange={(e) => setNewEntry({ ...newEntry, debit: e.target.value })}
+                                                                        className="mt-1 p-2 border rounded-md w-full focus:outline-none focus:ring focuslue-300"
+                                                                    />
+                                                                ) : (
+                                                                    parseFloat(entry.debit).toFixed(2)
+                                                                )}
+                                                            </td>
+                                                            <td className="py-2 px-4 text-left">
+                                                                {editingEntryId === entry.id ? (
+                                                                    <input
+                                                                        type="number"
+                                                                        value={newEntry.credit}
+                                                                        onChange={(e) => setNewEntry({ ...newEntry, credit: e.target.value })}
+                                                                        className="mt-1 p-2 border rounded-md w-full focus:outline-none focus:ring focuslue-300"
+                                                                    />
+                                                                ) : (
+                                                                    parseFloat(entry.credit).toFixed(2)
+                                                                )}
+                                                            </td>
+                                                            <td className="py-2 px-4">
+                                                                {editingEntryId === entry.id ? (
+                                                                    <div className="flex space-x-2">
+                                                                        <button
+                                                                            onClick={handleUpdateEntry}
+                                                                            className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-700"
+                                                                        >
+                                                                            Update
+                                                                        </button>
+                                                                        <button
+                                                                            onClick={() => setEditingEntryId(null)}
+                                                                            className="bg-gray-500 text-white py-2 px-4 rounded-md hover:bg-gray-700"
+                                                                        >
+                                                                            Cancel
+                                                                        </button>
+                                                                    </div>
+                                                                ) : (
+                                                                    <div className="flex space-x-2">
+                                                                        <button
+                                                                            onClick={() => handleEditEntry(entry.id)}
+                                                                            className="bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-700"
+                                                                        >
+                                                                            Edit
+                                                                        </button>
+                                                                        <button
+                                                                            onClick={() => handleRemoveEntry(entry.id)}
+                                                                            className="bg-red-500 text-white py-2 px-4 rounded-md hover:bg-red-700"
+                                                                        >
+                                                                            Delete
+                                                                        </button>
+                                                                    </div>
+                                                                )}
+                                                            </td>
+                                                        </tr>
+                                                    ))}
+                                                </tbody>
+                                            </table>
+                                        </td>
+                                    </tr>
+                                )}
+                            </React.Fragment>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
 
             {/* All Entries Table */}
-            <h2 className="text-xl font-bold mb-2 text-gray-800">All Entries</h2>
-            <table className="min-w-full bg-blue-50 border border-blue-200">
+            
+            <div className="shadow-lg rounded-md mt-4">
+            <h2 className="text-xl font-bold mb-2 text-center pt-4">All Entries</h2>
+            <table className="min-w-full">
                 <thead>
                     <tr className="bg-blue-100">
-                        <th onClick={() => requestSort('accountCode')} className="py-2 px-4 border-b text-left cursor-pointer">
+                        <th onClick={() => requestSort('accountCode')} className="py-2 px-4 text-left cursor-pointer">
                             Account Code {getSortIndicator('accountCode')}
                         </th>
-                        <th onClick={() => requestSort('date')} className="py-2 px-4 border-b text-left cursor-pointer">
+                        <th onClick={() => requestSort('date')} className="py-2 px-4 text-left cursor-pointer">
                             Date {getSortIndicator('date')}
                         </th>
-                        <th onClick={() => requestSort('description')} className="py-2 px-4 border-b text-left cursor-pointer">
+                        <th onClick={() => requestSort('description')} className="py-2 px-4 text-left cursor-pointer">
                             Description {getSortIndicator('description')}
                         </th>
-                        <th onClick={() => requestSort('debit')} className="py-2 px-4 border-b text-left cursor-pointer">
+                        <th onClick={() => requestSort('debit')} className="py-2 px-4 text-left cursor-pointer">
                             Debit {getSortIndicator('debit')}
                         </th>
-                        <th onClick={() => requestSort('credit')} className="py-2 px-4 border-b text-left cursor-pointer">
+                        <th onClick={() => requestSort('credit')} className="py-2 px-4 text-left cursor-pointer">
                             Credit {getSortIndicator('credit')}
                         </th>
-                        <th className="py-2 px-4 border-b text-left">Actions</th>
+                        <th className="py-2 px-4 text-left">Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     {sortedEntries.map((entry) => (
                         <tr key={entry.id}>
-                            <td className="py-2 px-4 border-b">{entry.accountCode}</td>
-                            <td className="py-2 px-4 border-b">{entry.date}</td>
-                            <td className="py-2 px-4 border-b">{entry.description}</td>
-                            <td className="py-2 px-4 border-b">{parseFloat(entry.debit).toFixed(2)}</td>
-                            <td className="py-2 px-4 border-b">{parseFloat(entry.credit).toFixed(2)}</td>
-                            <td className="py-2 px-4 border-b">
+                            <td className="py-2 px-4">{entry.accountCode}</td>
+                            <td className="py-2 px-4">{entry.date}</td>
+                            <td className="py-2 px-4">{entry.description}</td>
+                            <td className="py-2 px-4">{parseFloat(entry.debit).toFixed(2)}</td>
+                            <td className="py-2 px-4">{parseFloat(entry.credit).toFixed(2)}</td>
+                            <td className="py-2 px-4">
                                 {editingEntryId === entry.id ? (
                                     <div className="flex space-x-2">
                                         <button
@@ -545,8 +549,9 @@ const GeneralLedgerPage = ({ ledgerData, setLedgerData }) => {
                     ))}
                 </tbody>
             </table>
+            </div>
 
-            <div className="bg-blue-50 border border-blue-200 p-4 mb-4 mt-4 rounded-md">
+            <div className="p-4 mb-4 mt-4 rounded-md shadow-lg">
                 <h2 className="text-xl font-bold mb-2 text-gray-800">Add New Account</h2>
                 <div className="space-y-2">
                     <div>
@@ -555,7 +560,7 @@ const GeneralLedgerPage = ({ ledgerData, setLedgerData }) => {
                             type="text"
                             value={newAccount.accountCode}
                             onChange={(e) => setNewAccount({ ...newAccount, accountCode: e.target.value })}
-                            className="mt-1 p-2 border rounded-md w-full focus:outline-none focus:ring focus:border-blue-300"
+                            className="mt-1 p-2 border rounded-md w-full focus:outline-none focus:ring focuslue-300"
                         />
                     </div>
                     <div>
@@ -564,7 +569,7 @@ const GeneralLedgerPage = ({ ledgerData, setLedgerData }) => {
                             type="text"
                             value={newAccount.accountName}
                             onChange={(e) => setNewAccount({ ...newAccount, accountName: e.target.value })}
-                            className="mt-1 p-2 border rounded-md w-full focus:outline-none focus:ring focus:border-blue-300"
+                            className="mt-1 p-2 border rounded-md w-full focus:outline-none focus:ring focuslue-300"
                         />
                     </div>
                     <div>
@@ -572,7 +577,7 @@ const GeneralLedgerPage = ({ ledgerData, setLedgerData }) => {
                         <select
                             value={newAccount.accountType}
                             onChange={(e) => setNewAccount({ ...newAccount, accountType: e.target.value })}
-                            className="mt-1 p-2 border rounded-md w-full focus:outline-none focus:ring focus:border-blue-300"
+                            className="mt-1 p-2 border rounded-md w-full focus:outline-none focus:ring focuslue-300"
                         >
                             <option value="" disabled>Select Account Type</option>
                             {accountTypes.map((type) => (
@@ -590,7 +595,7 @@ const GeneralLedgerPage = ({ ledgerData, setLedgerData }) => {
                     </button>
                 </div>
             </div>
-            <div className="bg-blue-50 border border-blue-200 p-4 mb-4 mt-4 rounded-md">
+            <div className="bg-blue-50 borderlue-200 p-4 mb-4 mt-4 rounded-md">
                 <h2 className="text-xl font-bold mb-2 text-gray-800">Add New Entry</h2>
                 <div className="space-y-2">
                     <div>
@@ -599,7 +604,7 @@ const GeneralLedgerPage = ({ ledgerData, setLedgerData }) => {
                         <select
                             value={selectedAccountCode}
                             onChange={(e) => setSelectedAccountCode(e.target.value)}
-                            className="mt-1 p-2 border rounded-md w-full focus:outline-none focus:ring focus:border-blue-300"
+                            className="mt-1 p-2 border rounded-md w-full focus:outline-none focus:ring focuslue-300"
                         >
                             <option value="" disabled selected="selected">Select Account</option>
                             {ledgerData.map((account) => (
@@ -615,7 +620,7 @@ const GeneralLedgerPage = ({ ledgerData, setLedgerData }) => {
                             type="date"
                             value={newEntry.date}
                             onChange={(e) => setNewEntry({ ...newEntry, date: e.target.value })}
-                            className="mt-1 p-2 border rounded-md w-full focus:outline-none focus:ring focus:border-blue-300"
+                            className="mt-1 p-2 border rounded-md w-full focus:outline-none focus:ring focuslue-300"
                         />
                     </div>
                     <div>
@@ -624,7 +629,7 @@ const GeneralLedgerPage = ({ ledgerData, setLedgerData }) => {
                             type="text"
                             value={newEntry.description}
                             onChange={(e) => setNewEntry({ ...newEntry, description: e.target.value })}
-                            className="mt-1 p-2 border rounded-md w-full focus:outline-none focus:ring focus:border-blue-300"
+                            className="mt-1 p-2 border rounded-md w-full focus:outline-none focus:ring focuslue-300"
                         />
                     </div>
                     <div>
@@ -633,7 +638,7 @@ const GeneralLedgerPage = ({ ledgerData, setLedgerData }) => {
                             type="number"
                             value={parseFloat(newEntry.debit).toFixed(2)}
                             onChange={(e) => setNewEntry({ ...newEntry, debit: e.target.value })}
-                            className="mt-1 p-2 border rounded-md w-full focus:outline-none focus:ring focus:border-blue-300"
+                            className="mt-1 p-2 border rounded-md w-full focus:outline-none focus:ring focuslue-300"
                         />
                     </div>
                     <div>
@@ -642,7 +647,7 @@ const GeneralLedgerPage = ({ ledgerData, setLedgerData }) => {
                             type="number"
                             value={parseFloat(newEntry.credit).toFixed(2)}
                             onChange={(e) => setNewEntry({ ...newEntry, credit: e.target.value })}
-                            className="mt-1 p-2 border rounded-md w-full focus:outline-none focus:ring focus:border-blue-300"
+                            className="mt-1 p-2 border rounded-md w-full focus:outline-none focus:ring focuslue-300"
                         />
                     </div>
                     <button

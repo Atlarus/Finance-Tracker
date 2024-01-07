@@ -133,18 +133,18 @@ const App = () => {
 
     return (
         <Router>
-            <div className="font-sans min-h-screen flex flex-col">
-                <nav className="bg-gray-800 text-white p-4">
+            <div className="font-mono min-h-screen flex flex-col">
+                <nav className="bg-gradient-to-br from-primary to-secondary p-4 shadow-lg">
                     <ul className="flex space-x-4">
-                        <li><Link to="/" className="hover:text-gray-300">General Ledger</Link></li>
-                        <li><Link to="/documents" className="hover:text-gray-300">Documents</Link></li>
-                        <li><Link to="/budget" className="hover:text-gray-300">Budgeting and Forecasting</Link></li>
-                        <li><Link to="/report" className="hover:text-gray-300">Financial Report</Link></li>
-                        <li><Link to="/inventory" className="hover:text-gray-300">Inventory</Link></li>
-                        <li><Link to="/vendors" className="hover:text-gray-300">Vendors</Link></li>
-                        <li><Link to="/management" className="hover:text-gray-300">Management</Link></li>
-                        <li><Link to="/settings" className="hover:text-gray-300">Settings</Link></li>
-                        <li><Link to="/auth" className="hover:text-gray-300">Login</Link></li>
+                        <li><Link to="/">General Ledger</Link></li>
+                        <li><Link to="/documents">Documents</Link></li>
+                        <li><Link to="/budget">Budgeting and Forecasting</Link></li>
+                        <li><Link to="/report">Financial Report</Link></li>
+                        <li><Link to="/inventory">Inventory</Link></li>
+                        <li><Link to="/vendors">Vendors</Link></li>
+                        <li><Link to="/management">Management</Link></li>
+                        <li><Link to="/settings">Settings</Link></li>
+                        <li><Link to="/auth">Login</Link></li>
                     </ul>
                 </nav>
                 <Routes>
