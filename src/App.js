@@ -135,25 +135,18 @@ const App = () => {
                         <li><Link to="/documents" className="hover:text-gray-300">Documents</Link></li>
                         <li><Link to="/budget" className="hover:text-gray-300">Budgeting and Forecasting</Link></li>
                         <li><Link to="/report" className="hover:text-gray-300">Financial Report</Link></li>
-                        <li><Link to="/inventory" className="hove:text-gray-300">Inventory</Link></li>
-                        <li><Link to="/vendors" className="hove:text-gray-300">Vendors</Link></li>
-                        <li><Link to="/management" className="hove:text-gray-300">Management</Link></li>
-                        <li><Link to="/settings" className="hove:text-gray-300">Settings</Link></li>
-                        <li><Link to="/auth" className="hove:text-gray-300">Login</Link></li>
+                        <li><Link to="/inventory" className="hover:text-gray-300">Inventory</Link></li>
+                        <li><Link to="/vendors" className="hover:text-gray-300">Vendors</Link></li>
+                        <li><Link to="/management" className="hover:text-gray-300">Management</Link></li>
+                        <li><Link to="/settings" className="hover:text-gray-300">Settings</Link></li>
+                        <li><Link to="/auth" className="hover:text-gray-300">Login</Link></li>
                     </ul>
                 </nav>
                 <Routes>
-                    <Route path="/" exact>
-                        <Route index element={<GeneralLedgerPage ledgerData={ledgerData} setLedgerData={setLedgerData} />} />
-                        {/* <Route path="/inventory" element={} />
-                        <Route path="/vendors" element={} />
-                        <Route path="/management" element={} />
-                        <Route path="/settings" element={} />
-                        <Route path="/auth" element={} /> */}
-                    </Route>
-                    <Route path="budget" element={<BudgetForecastPage ledgerData={ledgerData} />} />
-                    <Route path="report" element={<FinancialReportPage ledgerData={ledgerData} />} />
-                    <Route path="documents" element={<InvoicePage invoices={invoiceData} setInvoiceData={setInvoiceData} />} />
+                    <Route path="/" exact element={<GeneralLedgerPage ledgerData={ledgerData} setLedgerData={setLedgerData} />} />
+                    <Route path="/budget" element={<BudgetForecastPage ledgerData={ledgerData} />} />
+                    <Route path="/report" element={<FinancialReportPage ledgerData={ledgerData} />} />
+                    <Route path="/documents" element={<InvoicePage invoices={invoiceData} setInvoiceData={setInvoiceData} />} />
                 </Routes>
             </div>
         </Router>
