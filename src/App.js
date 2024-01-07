@@ -132,7 +132,7 @@ const App = () => {
                 <nav className="bg-gray-800 text-white p-4">
                     <ul className="flex space-x-4">
                         <li><Link to="/" className="hover:text-gray-300">General Ledger</Link></li>
-                        <li><Link to="/invoice" className="hover:text-gray-300">Invoice</Link></li>
+                        <li><Link to="/documents" className="hover:text-gray-300">Documents</Link></li>
                         <li><Link to="/budget" className="hover:text-gray-300">Budgeting and Forecasting</Link></li>
                         <li><Link to="/report" className="hover:text-gray-300">Financial Report</Link></li>
                         <li><Link to="/inventory" className="hove:text-gray-300">Inventory</Link></li>
@@ -153,7 +153,7 @@ const App = () => {
                     </Route>
                     <Route path="budget" element={<BudgetForecastPage ledgerData={ledgerData} />} />
                     <Route path="report" element={<FinancialReportPage ledgerData={ledgerData} />} />
-                    <Route path="invoice" element={<InvoicePage invoices={invoiceData} setInvoiceData={setInvoiceData} />} />
+                    <Route path="documents" element={<InvoicePage invoices={invoiceData} setInvoiceData={setInvoiceData} />} />
                 </Routes>
             </div>
         </Router>
