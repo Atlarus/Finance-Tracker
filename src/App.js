@@ -6,6 +6,11 @@ import InvoicePage from './components/Documents/Invoice/InvoicePage';
 import BudgetForecastPage from './components/Budget/BudgetForecastPage';
 import FinancialReportPage from './components/Report/FinancialReportPage';
 import GeneralLedgerPage from './components/Ledger/GeneralLedgerPage';
+import InventoryPage from './components/Inventory/InventoryPage';
+import VendorPage from './components/Vendors/Vendors';
+import Auth from './components/Auth/Auth';
+import SettingsPage from './components/Settings/SettingsPage';
+import ManagementPage from './components/Management/ManagementPage';
 
 const App = () => {
     // Dummy ledger data for demonstration
@@ -147,6 +152,11 @@ const App = () => {
                     <Route path="/budget" element={<BudgetForecastPage ledgerData={ledgerData} />} />
                     <Route path="/report" element={<FinancialReportPage ledgerData={ledgerData} />} />
                     <Route path="/documents" element={<InvoicePage invoices={invoiceData} setInvoiceData={setInvoiceData} />} />
+                    <Route path="/inventory" element={<InventoryPage />} />
+                    <Route path="/vendors" element={<VendorPage />} />
+                    <Route path="/management" element={<ManagementPage />} />
+                    <Route path="/settings" element={<SettingsPage />} />
+                    <Route path="/auth" element={<Auth />} />
                 </Routes>
             </div>
         </Router>

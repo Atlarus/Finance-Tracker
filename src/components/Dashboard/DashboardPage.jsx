@@ -1,27 +1,11 @@
-// DashboardPage.jsx
+import React from "react";
 
-import React from 'react';
-import BudgetForecastView from './components/views/BudgetForecastView';
-import CashFlowManagementView from './components/views/CashFlowManagementView';
-import FinancialReportView from './components/views/FinancialReportView';
-
-const DashboardPage = ({
-  budgetData,
-  cashFlowData,
-  financialReportData,
-}) => {
-  return (
-    <div className="p-4">
-      <h1 className="text-3xl font-bold mb-6">Dashboard</h1>
-
-      {/* Add components for each section */}
-      <div className="grid grid-cols-2 gap-4 mb-6">
-        <CashFlowManagementView cashFlowData={cashFlowData} />
-      </div>
-
-      {/* Additional summary or charts can be added here */}
-    </div>
-  );
-};
+const DashboardPage = () => {
+    return(
+        <div>
+            This is the Dashboard
+        </div>
+    )
+}
 
 export default DashboardPage;
