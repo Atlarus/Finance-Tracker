@@ -32,6 +32,14 @@ const CurrencyPage = () => {
     }));
   };
 
+  const handleActionClick = (currency, action) => {
+    if (action === "edit") {
+      handleEditToggle(currency);
+    } else if (action === "remove") {
+      handleRemoveCurrency(currency);
+    }
+  };
+
   const handleAddCurrency = () => {
     if (newCurrency.trim() && newRate && !currenciesInTable.includes(newCurrency.toUpperCase())) {
       setCurrencyRates((prevRates) => ({
@@ -48,6 +56,18 @@ const CurrencyPage = () => {
     } else {
       // Handle invalid input (e.g., empty currency, rate, or duplicate currency)
     }
+  };
+
+  const handleRemoveCurrency = (currency) => {
+    setCurrencyRates((prevRates) => {
+      const newRates = { ...prevRates };
+      delete newRates[currency];
+      return newRates;
+    });
+
+    setCurrenciesInTable((prevCurrencies) =>
+      prevCurrencies.filter((c) => c !== currency)
+    );
   };
 
   const handleAddCurrencyModalOpen = () => {
@@ -88,37 +108,50 @@ const CurrencyPage = () => {
   }, []);
 
   return (
-    <div className="container mx-auto p-4">
-      <h2 className="text-2xl font-bold mb-4">Set Currency Rates</h2>
+    <div className="container mx-auto p-4 border rounded-md shadow-lg">
+      <h2 className="text-2xl font-bold mb-4 text-center">Set Currency Rates</h2>
       <table className="w-full table-auto">
         <thead>
           <tr>
-            <th className="px-4 py-2">Currency</th>
-            <th className="px-4 py-2">Rate</th>
-            <th className="px-4 py-2">Edit</th>
+            <th className="px-4 py-2 text-center">Currency</th>
+            <th className="px-4 py-2 text-center">Rate</th>
+            <th className="px-4 py-2 text-center">Actions</th> {/* Combined column for Actions */}
           </tr>
         </thead>
         <tbody>
           {Object.entries(currencyRates).map(([currency, rate]) => (
-            <tr key={currency}>
+            <tr key={currency} className="text-center">
               <td className="px-4 py-2">{currency}</td>
-              <td>
-                <input
-                  type="number"
-                  name={currency}
-                  value={rate}
-                  onChange={(e) => handleRateChange(e, currency)}
-                  disabled={!editModes[currency]}
-                  className="w-full p-2 border rounded"
-                />
+              <td className="text-center">
+                {editModes[currency] ? (
+                  <input
+                    type="number"
+                    name={currency}
+                    value={rate}
+                    onChange={(e) => handleRateChange(e, currency)}
+                    className="w-full p-2 border rounded"
+                  />
+                ) : (
+                  <span>{rate}</span>
+                )}
               </td>
-              <td>
-                <button
-                  onClick={() => handleEditToggle(currency)}
-                  className="bg-green-500 text-white px-2 py-1 rounded"
-                >
-                  {editModes[currency] ? "Done" : "Edit"}
-                </button>
+              <td className="text-center">
+                <div className="flex justify-center space-x-2">
+                  <button
+                    onClick={() => handleActionClick(currency, "edit")}
+                    className={`bg-green-500 text-white px-2 py-1 rounded-md border ${
+                      editModes[currency] ? "bg-yellow-500" : ""
+                    }`}
+                  >
+                    {editModes[currency] ? "Done" : "Edit"}
+                  </button>
+                  <button
+                    onClick={() => handleActionClick(currency, "remove")}
+                    className="bg-red-500 text-white px-2 py-1 rounded-md border"
+                  >
+                    Remove
+                  </button>
+                </div>
               </td>
             </tr>
           ))}
@@ -127,7 +160,7 @@ const CurrencyPage = () => {
 
       <button
         onClick={handleAddCurrencyModalOpen}
-        className="bg-blue-500 text-white px-4 py-2 mt-4 rounded"
+        className="bg-blue-500 text-white px-4 py-2 mt-4 rounded-md border"
       >
         Add Currency
       </button>
