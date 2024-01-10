@@ -1,6 +1,6 @@
 // App.js
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { HashRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import InvoicePage from './components/Documents/Invoice/InvoicePage';
 import BudgetForecastPage from './components/Budget/BudgetForecastPage';
@@ -13,6 +13,7 @@ import SettingsPage from './components/Settings/SettingsPage';
 import ManagementPage from './components/Management/ManagementPage';
 
 const App = () => {
+    const [loggedIn, setLoggedIn] = useState(false);
   
     // State to store ledger and accounts data
     const [ledgerData, setLedgerData] = useState([
@@ -120,8 +121,22 @@ const App = () => {
             // Add more dummy invoices as needed
     ]);
 
+    const getLogin = () => {
+        const companyID = localStorage.getItem("CID");
+        const userID = localStorage.getItem("UID");
+        
+        if(companyID && userID){
+            setLoggedIn(true);
+        }
+    }
+
+    useEffect(() => {
+        getLogin();
+    }, [loggedIn]);
+
     return (
         <Router>
+            {loggedIn ? (
             <div className="font-mono min-h-screen flex flex-col">
                 <nav className="bg-gradient-to-br from-primary to-secondary p-4 shadow-lg">
                     <ul className="flex space-x-4">
@@ -148,6 +163,19 @@ const App = () => {
                     <Route path="/auth" element={<Auth />} />
                 </Routes>
             </div>
+            ) : (
+                <div className="font-mono min-h-screen flex flex-col">
+                    <nav className="bg-gradient-to-br from-primary to-secondary p-4 shadow-lg">
+                        <ul className="flex space-x-4">
+                            <li><Link to="/">Finance
+                            </Link></li>
+                        </ul>
+                    </nav>
+                    <Routes>
+                        <Route path="/" element={<Auth />} />
+                    </Routes>
+                </div>
+            )}
         </Router>
     );
 };

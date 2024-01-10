@@ -256,8 +256,6 @@ const GeneralLedgerPage = ({ ledgerData, setLedgerData }) => {
 
 
     useEffect(() => {
-        console.log("useEffect triggered");
-
         // Calculate balances for all accounts
         const updatedLedgerData = ledgerData.map((account) => ({
             ...account,

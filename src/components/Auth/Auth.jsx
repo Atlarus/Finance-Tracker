@@ -13,6 +13,8 @@ const Auth = () => {
         const userID = e.target[1].value;
         const password = e.target[2].value;
         console.log(companyID + " " + userID + " " + password);
+        localStorage.setItem("CID", JSON.stringify(companyID));
+        localStorage.setItem("UID", JSON.stringify(userID));
         navigate("/");
     }
 
