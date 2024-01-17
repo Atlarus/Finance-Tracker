@@ -11,12 +11,12 @@ const ManagementPage = () => {
   };
 
   return (
-    <div className="flex">
-      <div className="fixed h-screen w-48 bg-secondary shadow-lg text-white flex flex-col">
-        {/* Sidebar with tabs */}
-        <ul className="flex flex-col">
+    <div className="flex flex-col">
+      <div className="w-full bg-secondary shadow-lg flex items-center">
+        {/* Horizontal Tabs */}
+        <ul className="flex">
           <li
-            className={`text-lg font-semibold py-2 px-4 hover:bg-primary ${
+            className={`text-lg font-semibold px-4 hover:bg-primary ${
               activeTab === "access" ? "bg-primary" : ""
             }`}
             onClick={() => handleTabClick("access")}
@@ -24,7 +24,7 @@ const ManagementPage = () => {
             Access
           </li>
           <li
-            className={`text-lg font-semibold py-2 px-4 hover:bg-primary ${
+            className={`text-lg font-semibold px-4 hover:bg-primary ${
               activeTab === "currency" ? "bg-primary" : ""
             }`}
             onClick={() => handleTabClick("currency")}
@@ -32,18 +32,18 @@ const ManagementPage = () => {
             Currency
           </li>
           <li
-            className={`text-lg font-semibold py-2 px-4 hover:bg-primary ${
+            className={`text-lg font-semibold px-4 hover:bg-primary ${
               activeTab === "flows" ? "bg-primary" : ""
             }`}
             onClick={() => handleTabClick("flows")}
           >
             Flows
           </li>
-          </ul>
+        </ul>
       </div>
 
-      <div className="flex-grow ml-64 bg-gray-100 p-4">
-        {/* Tab content on the right */}
+      <div className="flex-grow bg-gray-100 p-4">
+        {/* Tab content below the tabs */}
         {activeTab === "access" && <AccessPage />}
         {activeTab === "currency" && <CurrencyPage />}
         {activeTab === "flows" && <FlowPage />}
@@ -51,4 +51,5 @@ const ManagementPage = () => {
     </div>
   );
 };
+
 export default ManagementPage;
