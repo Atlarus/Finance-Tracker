@@ -95,7 +95,10 @@ const Auth = ({handleLogin}) => {
               type={type}
               onChange={(e) => setPassword(e.target.value)}
             />
-            <button onClick={() => setShown(!shown)} className="px-2 ">
+            <button onClick={(e) => {
+                e.preventDefault();
+                setShown(!shown);
+            }} className="px-2 ">
               <Icon className="w-5 h-5 text-gray-500" />
             </button>
           </div>

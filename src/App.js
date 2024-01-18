@@ -38,10 +38,9 @@ const App = () => {
 
     const handleLogin = () => {
         try{
-            const {sessionToken, isExpired} = UseJWT(localStorage.getItem("Token"));
+            const sessionToken = localStorage.getItem("Token");
             if(sessionToken) {
                 console.log(sessionToken);
-                console.log(isExpired);
                 setIsAuthenticated(true);
             }
         } finally {
