@@ -37,10 +37,21 @@ const App = () => {
     };
 
     const handleLogin = () => {
-        // Add authentication logic here, e.g., calling an authentication API
-        // If authentication is successful, update the isAuthenticated state
-        setIsAuthenticated(true);
+        try{
+            const {sessionToken, isExpired} = UseJWT(localStorage.getItem("Token"));
+            if(sessionToken) {
+                console.log(sessionToken);
+                console.log(isExpired);
+                setIsAuthenticated(true);
+            }
+        } finally {
+
+        }
     };
+
+    const handleLogout = () => {
+
+    }
 
     const renderMainContent = () => {
         if (isAuthenticated) {
@@ -67,11 +78,11 @@ const App = () => {
                 case 'Settings':
                     return <div><SettingsPage /></div>;
                 default:
-                    return null;
+                    return <div><DashboardPage /></div>;
             }
         } else {
             // Render Auth component if not authenticated
-            return <Auth setIsAuthenticated={setIsAuthenticated} />;
+            return <Auth handleLogin={handleLogin} />;
         }
     };
 
