@@ -11,7 +11,6 @@ const VendorPage = () => {
       email: "alice@vendorA.com",
       taxID: "A123456",
       paymentTerms: "Net 30",
-      productsServices: "Goods",
       invoices: [
         { invoiceNumber: "VA001", invoiceDate: "2024-01-01", dueDate: "2024-01-31", totalAmount: 1000 },
         // Add more invoices for Vendor A
@@ -25,7 +24,6 @@ const VendorPage = () => {
       email: "bob@vendorB.com",
       taxID: "B789012",
       paymentTerms: "Net 45",
-      productsServices: "Services",
       invoices: [
         { invoiceNumber: "VB001", invoiceDate: "2024-02-01", dueDate: "2024-02-29", totalAmount: 1500 },
         // Add more invoices for Vendor B
@@ -37,9 +35,7 @@ const VendorPage = () => {
       address: "789 Pine St, City C",
       phoneNumber: "555-3333",
       email: "charlie@vendorC.com",
-      taxID: "C345678",
       paymentTerms: "Net 60",
-      productsServices: "Goods and Services",
       invoices: [
         { invoiceNumber: "VC001", invoiceDate: "2024-03-01", dueDate: "2024-03-31", totalAmount: 2000 },
         // Add more invoices for Vendor C
@@ -51,9 +47,7 @@ const VendorPage = () => {
       address: "101 Cedar St, City D",
       phoneNumber: "555-4444",
       email: "david@vendorD.com",
-      taxID: "D901234",
       paymentTerms: "Net 45",
-      productsServices: "Services",
       invoices: [
         { invoiceNumber: "VD001", invoiceDate: "2024-04-01", dueDate: "2024-04-30", totalAmount: 1200 },
         // Add more invoices for Vendor D
@@ -65,9 +59,7 @@ const VendorPage = () => {
       address: "202 Elm St, City E",
       phoneNumber: "555-5555",
       email: "eva@vendorE.com",
-      taxID: "E567890",
       paymentTerms: "Net 30",
-      productsServices: "Goods",
       invoices: [
         { invoiceNumber: "VE001", invoiceDate: "2024-05-01", dueDate: "2024-05-31", totalAmount: 1800 },
         // Add more invoices for Vendor E
@@ -106,9 +98,7 @@ const VendorPage = () => {
             <th className="py-2 px-4 border">Address</th>
             <th className="py-2 px-4 border">Phone Number</th>
             <th className="py-2 px-4 border">Email</th>
-            <th className="py-2 px-4 border">Tax ID</th>
             <th className="py-2 px-4 border">Payment Terms</th>
-            <th className="py-2 px-4 border">Products/Services</th>
             <th className="py-2 px-4 border">Actions</th>
           </tr>
         </thead>
@@ -120,9 +110,7 @@ const VendorPage = () => {
               <td className="py-2 px-4 border">{vendor.address}</td>
               <td className="py-2 px-4 border">{vendor.phoneNumber}</td>
               <td className="py-2 px-4 border">{vendor.email}</td>
-              <td className="py-2 px-4 border">{vendor.taxID}</td>
               <td className="py-2 px-4 border">{vendor.paymentTerms}</td>
-              <td className="py-2 px-4 border">{vendor.productsServices}</td>
               <td className="py-2 px-4 border">
                 <button
                   onClick={() => handleEdit(index)}
