@@ -39,7 +39,7 @@ const AccessPage = () => {
 
     return (
         <div className="shadow-lg rounded-md border my-4 p-8 pt-4 mx-auto">
-          <h1 className="text-center pb-4">Login</h1>
+          <h1 className="text-center pb-4">Add New User</h1>
           <form className="grid grid-cols-2 gap-y-4" autoComplete="off">
             <label>User ID:</label>
             <input

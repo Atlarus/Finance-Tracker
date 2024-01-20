@@ -33,30 +33,6 @@ async function connectToDb() {
   }
 }
 
-async function listCollectionNames(db) {
-  try {
-    const collectionCursor = await db.listCollections();
-    const collectionNames = [];
-    await collectionCursor.forEach(collection => {
-      collectionNames.push(collection.name);
-    });
-    return collectionNames;
-  } catch (err) {
-    console.error(err);
-    throw err;
-  }
-}
-
-async function retrieveDataFromCollection(db, collectionName) {
-  try {
-    const data = await db.collection(collectionName).find().toArray();
-    return data;
-  } catch (err) {
-    console.error(`Error retrieving data from ${collectionName}:`, err);
-    throw err;
-  }
-}
-
 async function retrieveDataWithCondition(db, collectionName, condition) {
   try {
     const data = await db.collection(collectionName).find(condition).toArray();
@@ -66,29 +42,6 @@ async function retrieveDataWithCondition(db, collectionName, condition) {
     throw err;
   }
 }
-
-app.get('/collection-names', async (req, res) => {
-  try {
-    const db = await connectToDb();
-    const collectionNames = await listCollectionNames(db);
-    res.json({ collectionNames });
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('Error listing collection names');
-  }
-});
-
-app.get('/retrieve-data/:collectionName', async (req, res) => {
-  try {
-    const { collectionName } = req.params;
-    const db = await connectToDb();
-    const data = await retrieveDataFromCollection(db, collectionName);
-    res.json({ data });
-  } catch (err) {
-    console.error(err);
-    res.status(500).send('Error retrieving data');
-  }
-});
 
 app.get('/retrieve-company-data/:collectionName/:field/:value', async (req, res) => {
   try {

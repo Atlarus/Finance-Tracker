@@ -49,7 +49,7 @@ const App = () => {
     };
 
     const handleLogout = () => {
-
+        setIsAuthenticated(false)
     }
 
     const renderMainContent = () => {
