@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/solid";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 
 const Auth = ({handleLogin}) => {
   const [shown, setShown] = useState(false);
@@ -9,6 +11,7 @@ const Auth = ({handleLogin}) => {
   const [userID, setUserID] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -81,7 +84,7 @@ const Auth = ({handleLogin}) => {
           </div>
         </div>
         <button className="col-span-2 border rounded-md" type="submit" onClick={handleSubmit} disabled={isLoading}>
-          {isLoading ? 'Loading...' : 'Login'}
+          {isLoading ? <FontAwesomeIcon icon={faSpinner} spin /> : 'Login'}
         </button>
       </form>
     </div>

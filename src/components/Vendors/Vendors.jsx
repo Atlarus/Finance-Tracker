@@ -83,6 +83,18 @@ const VendorPage = () => {
     // axios.get("api/vendors").then((response) => setVendors(response.data));
   }, []); // Empty dependency array to mimic componentDidMount
 
+  const handleEdit = (index) => {
+    // Implement logic to handle the edit action
+    console.log(`Edit vendor at index ${index}`);
+  };
+
+  const handleRemove = (index) => {
+    // Implement logic to handle the remove action
+    const updatedVendors = [...vendors];
+    updatedVendors.splice(index, 1);
+    setVendors(updatedVendors);
+  };
+
   return (
     <div className="container mx-auto p-4">
       <h1 className="text-3xl font-bold mb-4">Vendor Information</h1>
@@ -97,6 +109,7 @@ const VendorPage = () => {
             <th className="py-2 px-4 border">Tax ID</th>
             <th className="py-2 px-4 border">Payment Terms</th>
             <th className="py-2 px-4 border">Products/Services</th>
+            <th className="py-2 px-4 border">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -110,6 +123,20 @@ const VendorPage = () => {
               <td className="py-2 px-4 border">{vendor.taxID}</td>
               <td className="py-2 px-4 border">{vendor.paymentTerms}</td>
               <td className="py-2 px-4 border">{vendor.productsServices}</td>
+              <td className="py-2 px-4 border">
+                <button
+                  onClick={() => handleEdit(index)}
+                  className="bg-blue-500 text-white px-2 py-1 mr-2"
+                >
+                  Edit
+                </button>
+                <button
+                  onClick={() => handleRemove(index)}
+                  className="bg-red-500 text-white px-2 py-1"
+                >
+                  Remove
+                </button>
+              </td>
             </tr>
           ))}
         </tbody>
