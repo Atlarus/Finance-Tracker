@@ -8,11 +8,14 @@ const Auth = ({handleLogin}) => {
   const [companyID, setCompanyID] = useState("");
   const [userID, setUserID] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
+      // Set loading state to true when the button is clicked
+      setIsLoading(true);
       const response = await fetch("http://localhost:3001/login", {
         method: "POST",
         headers: {
@@ -26,6 +29,8 @@ const Auth = ({handleLogin}) => {
       });
 
       if (!response.ok) {
+        setIsLoading(false);
+        alert("Invalid Credentials");
         throw new Error("Invalid credentials");
       }
 
@@ -40,34 +45,6 @@ const Auth = ({handleLogin}) => {
     } catch (error) {
       console.error("Login failed:", error.message);
       // Handle login failure, show an error message, etc.
-    }
-  };
-
-  const handleInsertUser = async () => {
-    try {
-      const response = await fetch(`http://localhost:3001/insert-user/${companyID}`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          UID: userID,
-          password: password,
-        }),
-      });
-
-      if (!response.ok) {
-        const data = await response.json();
-        console.error("User insertion failed:", data.message);
-        // Handle the failure, show an error message, etc.
-      } else {
-        const data = await response.json();
-        console.log("User inserted successfully. Inserted ID:", data.insertedId);
-        // Handle success, perform other actions, etc.
-      }
-    } catch (error) {
-      console.error("User insertion failed:", error.message);
-      // Handle the failure, show an error message, etc.
     }
   };
 
@@ -103,11 +80,8 @@ const Auth = ({handleLogin}) => {
             </button>
           </div>
         </div>
-        <button className="col-span-2 border rounded-md" type="submit" onClick={handleSubmit}>
-          Login
-        </button>
-        <button className="col-span-2 border rounded-md" type="button" onClick={handleInsertUser}>
-          Insert User
+        <button className="col-span-2 border rounded-md" type="submit" onClick={handleSubmit} disabled={isLoading}>
+          {isLoading ? 'Loading...' : 'Login'}
         </button>
       </form>
     </div>
