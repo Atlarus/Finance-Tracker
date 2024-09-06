@@ -1,1 +1,0 @@
-Finance Tracking System developed by Atlarus Enterprise
